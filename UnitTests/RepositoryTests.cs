@@ -11,16 +11,16 @@ namespace UnitTests
         public void Setup()
         {
             _repo = new IngrediantRepo();
-            _repo.Add(new Ingredient(0, "Ingredient 1", "g", new NutritionalProfile(50, 200, 0.2f, 0.05f, 10f, 2f, 1f, 0.1f)));
-            _repo.Add(new Ingredient(0, "Ingredient 2", "ml", new NutritionalProfile(30, 125, 0.1f, 0.02f, 5f, 1f, 0.5f, 0.05f)));
-            _repo.Add(new Ingredient(0, "Ingredient 3", "pcs", new NutritionalProfile(80, 335, 0.3f, 0.08f, 15f, 3f, 2f, 0.15f)));
+            _repo.Add(new Ingredient(0, "Ingredient 1", UnitEnum.Unit.Gram, new NutritionalProfile(50, 200, 0.2f, 0.05f, 10f, 2f, 1f, 0.1f)));
+            _repo.Add(new Ingredient(0, "Ingredient 2", UnitEnum.Unit.Milliliter, new NutritionalProfile(30, 125, 0.1f, 0.02f, 5f, 1f, 0.5f, 0.05f)));
+            _repo.Add(new Ingredient(0, "Ingredient 3", UnitEnum.Unit.Piece, new NutritionalProfile(80, 335, 0.3f, 0.08f, 15f, 3f, 2f, 0.15f)));
         }
 
         [TestMethod]
         public void AddIngredientToRepo()
         {
             var nutritionalProfile = new NutritionalProfile(100, 418, 0.5f, 0.1f, 20f, 5f, 3f, 0.2f);
-            var ingredient = new Ingredient(1, "Test Ingredient", "g", nutritionalProfile);
+            var ingredient = new Ingredient(1, "Test Ingredient", UnitEnum.Unit.Gram, nutritionalProfile);
             var addedIngredient = _repo.Add(ingredient);
             Assert.IsNotNull(addedIngredient);
             Assert.AreEqual(ingredient.Id, addedIngredient.Id);

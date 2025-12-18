@@ -21,7 +21,7 @@
                 _name = value;
             }
         }
-        public string BaseUnit { get; set; }
+        public UnitEnum.Unit BaseUnit { get; set; }
         public NutritionalProfile NutritionalProfile 
         {
             get { return _nutritionalProfile; }
@@ -41,7 +41,7 @@
         }
 
         // Parameterized constructor
-        public Ingredient(int id, string name, string baseUnit, NutritionalProfile nutritionalProfile)
+        public Ingredient(int id, string name, UnitEnum.Unit baseUnit, NutritionalProfile nutritionalProfile)
         {
             Id = id;
             Name = name;
