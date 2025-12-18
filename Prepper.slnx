@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Prepper/Prepper.csproj" />
+  <Project Path="UnitTests/UnitTests.csproj" />
+</Solution>
