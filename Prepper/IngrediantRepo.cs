@@ -53,7 +53,15 @@ namespace Prepper
 
         public Ingredient? Update(int id, Ingredient item)
         {
-            throw new NotImplementedException();
+            var existingIngredient = GetById(id);
+            if(existingIngredient == null)
+            {
+                throw new KeyNotFoundException($"Ingredient with ID {id} not found.");
+            }
+            existingIngredient.Name = item.Name;
+            existingIngredient.BaseUnit = item.BaseUnit;
+            existingIngredient.NutritionalProfile = item.NutritionalProfile;
+            return existingIngredient;
         }
     }
 }

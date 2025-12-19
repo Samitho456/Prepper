@@ -67,5 +67,36 @@ namespace UnitTests
         {
             Assert.Throws<KeyNotFoundException>(() => _repo.Delete(999));
         }
+        [TestMethod]
+        public void UpdateIngredient()
+        {
+            var updatedIngredient = _repo.Update(3, new Ingredient(3, "Updated Ingredient", UnitEnum.Unit.Kilogram, new NutritionalProfile(90, 376, 0.4f, 0.09f, 12f, 2.5f, 1.5f, 0.12f)));
+            Assert.IsNotNull(updatedIngredient);
+            Assert.AreEqual(3, updatedIngredient.Id);
+            Assert.AreEqual("Updated Ingredient", updatedIngredient.Name);
+            Assert.AreEqual(UnitEnum.Unit.Kilogram, updatedIngredient.BaseUnit);
+            Assert.AreEqual(90, updatedIngredient.NutritionalProfile.Kcal);
+        }
+
+        [TestMethod]
+        public void UpdateIngredient_NotFound()
+        {
+            Assert.Throws<KeyNotFoundException>(() => _repo.Update(999, new Ingredient(999, "Non-existent Ingredient", UnitEnum.Unit.Gram, new NutritionalProfile(0, 0, 0f, 0f, 0f, 0f, 0f, 0f))));
+        }
+
+        [TestMethod]
+        public void GetSortedByNameIngredients()
+        {
+        }
+
+        [TestMethod]
+        public void GetSortedIngredientsByNutritionalValue()
+        {
+        }
+
+        [TestMethod]
+        public void SearchIngredients()
+        {
+        }
     }
 }
