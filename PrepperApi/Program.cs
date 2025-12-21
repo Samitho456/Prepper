@@ -1,12 +1,46 @@
 using Prepper;
+using Prepper.Repositories;
+using DotNetEnv;
+using Supabase;
+using Prepper.Models;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Load environment variables from .env file
+Env.Load();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+bool useSupabaseDB = true;
+
+if (useSupabaseDB)
+{
+    var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+    var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+
+    // Initialize Supabase client
+    var options = new SupabaseOptions
+    {
+        AutoConnectRealtime = true,
+        AutoRefreshToken = true
+    };
+
+    // Register the Client as a Singleton
+    builder.Services.AddSingleton(provider => new Supabase.Client(url!, key!, options));
+    
+    // Register the repository
+    builder.Services.AddScoped<IRepositoryDB<Ingredient>, IngredientDBRepo>();
+}
+else
+{
+    builder.Services.AddSingleton<IRepository<Ingredient>, IngrediantRepo>();
+}
+
+
+
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+// Learn more about configuring OpenAPI at htt)ps://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
-builder.Services.AddSingleton<IRepository<Ingredient>, IngrediantRepo>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -44,4 +78,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-    

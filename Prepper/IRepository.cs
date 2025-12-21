@@ -6,10 +6,10 @@ namespace Prepper
 {
     public interface IRepository<T> where T : class
     {
-        public IEnumerable<T> GetAll();
-        public T? GetById(int id);
-        public T Add(T item);
-        public T? Update(int id, T item);
-        public T? Delete(int id);
+        IEnumerable<T> GetAll();
+        T? GetById(int id);
+        T Add(T item);
+        T? Update(int id, T item);
+        T? Delete(int id);
     }
 }
