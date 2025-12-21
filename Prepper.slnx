@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Prepper/Prepper.csproj" />
+  <Project Path="PrepperApi/PrepperApi.csproj" Id="2ef97573-dbf5-4e33-ba3e-08a057f90b3d" />
   <Project Path="UnitTests/UnitTests.csproj" />
 </Solution>

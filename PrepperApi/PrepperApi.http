@@ -1,0 +1,6 @@
+@PrepperApi_HostAddress = http://localhost:5111
+
+GET {{PrepperApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
