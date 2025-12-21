@@ -15,12 +15,15 @@ namespace PrepperApi.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAll()
         {
             return Ok(_ingredientsRepo.GetAll());
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(int id)
         {
             try
@@ -35,6 +38,7 @@ namespace PrepperApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public IActionResult Create([FromBody] Ingredient ingredient)
         {
             var createdIngredient = _ingredientsRepo.Add(ingredient);
@@ -42,6 +46,8 @@ namespace PrepperApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
             try
@@ -54,7 +60,10 @@ namespace PrepperApi.Controllers
                 return NotFound(knfEx.Message);
             }
         }
+
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Update(int id, [FromBody] Ingredient ingredient)
         {
             try
