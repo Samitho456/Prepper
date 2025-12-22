@@ -1,4 +1,7 @@
 ﻿using Prepper.Models;
+using Supabase;
+using Supabase.Postgrest;
+using static Supabase.Postgrest.QueryOptions;
 
 namespace Prepper.Repositories
 {
@@ -19,7 +22,8 @@ namespace Prepper.Repositories
         public async Task<Ingredient> AddAsync(Ingredient item)
         {
             // Insert the new ingredient into the database
-            var result = await _supabase.From<Ingredient>().Insert(item);
+            var result = await _supabase.From<Ingredient>()
+                .Insert(item);
 
             // Return the inserted ingredient with its assigned ID
             return result.Models.FirstOrDefault();
@@ -52,13 +56,65 @@ namespace Prepper.Repositories
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all
         /// <see cref="Ingredient"/> objects. The collection will be empty if no ingredients are found.</returns>
-        public async Task<IEnumerable<Ingredient>> GetAllAsync()
+        public async Task<IEnumerable<Ingredient>> GetAllAsync(string sortBy = null, bool ascending = false)
         {
-            // Retrieve all ingredients from the database
-            var result = await _supabase.From<Ingredient>().Get();
+            if(sortBy == null)
+            {
+                // Retrieve all ingredients from the database
+                var result = await _supabase.From<Ingredient>().Get();
 
-            // Return the list of ingredients
-            return result.Models;
+                //// Return the list of ingredients
+                return result.Models;
+            } 
+            else
+            // Sort by name of the ingredient
+            if (sortBy.ToLower() == "name")
+            {
+                // Sorts the names Ascending
+                if (ascending)
+                {
+                    var result = await _supabase.From<Ingredient>()
+                        .Select(i => new object[] { i.Id, i.Name })
+                        .Order(i => i.Name, Supabase.Postgrest.Constants.Ordering.Ascending)
+                        .Get();
+                    return result.Models;
+                }
+                // Sorts the name Descending
+                else
+                {
+                    var result = await _supabase.From<Ingredient>()
+                        .Select(i => new object[] { i.Id, i.Name })
+                        .Order(i => i.Name, Supabase.Postgrest.Constants.Ordering.Descending)
+                        .Get();
+                    return result.Models;
+                }
+            }
+            // Sort by time added to supabase
+            else if (sortBy.ToLower() == "createdat")
+            {
+                // Sorts the ingredents by newest first
+                if (ascending)
+                {
+                    var result = await _supabase.From<Ingredient>()
+                        .Select(i => new object[] { i.Id, i.Name })
+                        .Order(i => i.CreatedAt, Supabase.Postgrest.Constants.Ordering.Ascending)
+                        .Get();
+                    return result.Models;
+                }
+                // Sorts the ingredients by oldest first
+                else
+                {
+                    var result = await _supabase.From<Ingredient>()
+                        .Select(i => new object[] { i.Id, i.Name })
+                        .Order(i => i.CreatedAt, Supabase.Postgrest.Constants.Ordering.Descending)
+                        .Get();
+                    return result.Models;
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Invalid sortBy parameter");
+            }
         }
 
         /// <summary>

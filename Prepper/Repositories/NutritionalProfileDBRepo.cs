@@ -50,7 +50,7 @@ namespace Prepper.Repositories
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of all <see
         /// cref="NutritionalProfile"/> objects. The collection is empty if no profiles are found.</returns>
-        public async Task<IEnumerable<NutritionalProfile>> GetAllAsync()
+        public async Task<IEnumerable<NutritionalProfile>> GetAllAsync(string sortBy = null, bool ascending = false )
         {
             var result = await _supabase.From<NutritionalProfile>().Get();
             return result.Models;

@@ -6,7 +6,7 @@ namespace Prepper
 {
     public interface IRepositoryDB<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(string sortBy = null, bool ascending = false);
         Task<T?> GetByIdAsync(int id);
         Task<T> AddAsync(T item);
         Task<T?> UpdateAsync(int id, T item);

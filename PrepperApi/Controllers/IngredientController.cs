@@ -6,16 +6,8 @@ using Prepper.DTOs;
 namespace PrepperApi.Controllers
 {
     [Route("api/[Controller]")]
-    public class IngredientController : Controller
+    public class IngredientController(IRepositoryDB<Ingredient> ingrediantRepo) : Controller
     {
-        // Using the database repository
-        private readonly IRepositoryDB<Ingredient> _ingredientsRepo;
-
-        // Constructor injection of the database repository
-        public IngredientController(IRepositoryDB<Ingredient> ingrediantRepo)
-        {
-            _ingredientsRepo = ingrediantRepo;
-        }
 
         /// <summary>
         /// Retrieves all ingredients.
@@ -23,17 +15,25 @@ namespace PrepperApi.Controllers
         /// <returns>An <see cref="IActionResult"/> containing a collection of all ingredients with a status code of 200 (OK).</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy, bool ascending)
         {
-            var ingredients = await _ingredientsRepo.GetAllAsync();
-            var ingredientDTOs = ingredients.Select(i => new IngredientDTO
+            try
             {
-                Id = i.Id,
-                Name = i.Name,
-                CreatedAt = i.CreatedAt
-            });
+                var ingredients = await ingrediantRepo.GetAllAsync(sortBy, ascending);
+                var ingredientDTOs = ingredients.Select(i => new IngredientDTO
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    CreatedAt = i.CreatedAt
+                });
 
-            return Ok(ingredientDTOs);
+                return Ok(ingredientDTOs);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace PrepperApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
-            var ingredient = await _ingredientsRepo.GetByIdAsync(id);
+            var ingredient = await ingrediantRepo.GetByIdAsync(id);
             if (ingredient == null)
             {
                 return NotFound($"Ingredient with ID {id} not found.");
@@ -76,25 +76,25 @@ namespace PrepperApi.Controllers
             {
                 return BadRequest("Ingredient data is required.");
             }
-            // Map DTO to Model
+            // Map DTO to Model - don't set CreatedAt, let database handle it
             var ingredient = new Ingredient
             {
                 Name = ingredientDTO.Name
+                // CreatedAt will be set by the database default
             };
 
             // Add the new ingredient to the repository
-            var createdIngredient = await _ingredientsRepo.AddAsync(ingredient);
+            var createdIngredient = await ingrediantRepo.AddAsync(ingredient);
 
-            // Map Model back to DTO
-            var createdIngredientDTO = new IngredientDTO
+            // Map Model back to a new object that only contains Id and Name
+            var createdIngredientResponse = new
             {
                 Id = createdIngredient.Id,
                 Name = createdIngredient.Name,
-                CreatedAt = createdIngredient.CreatedAt
             };
 
             // Return a CreatedAtAction response with the location of the new resource
-            return CreatedAtAction(nameof(Get), new { id = createdIngredientDTO.Id }, createdIngredientDTO);
+            return CreatedAtAction(nameof(Get), new { id = createdIngredientResponse.Id }, createdIngredientResponse);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace PrepperApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var deletedIngredient = await _ingredientsRepo.DeleteAsync(id);
+            var deletedIngredient = await ingrediantRepo.DeleteAsync(id);
             if (deletedIngredient == null)
             {
                 return NotFound($"Ingredient with ID {id} not found.");
@@ -140,7 +140,7 @@ namespace PrepperApi.Controllers
             {
                 Name = ingredientDto.Name
             };
-            var updatedIngredient = await _ingredientsRepo.UpdateAsync(id, ingredient);
+            var updatedIngredient = await ingrediantRepo.UpdateAsync(id, ingredient);
             if (updatedIngredient == null)
             {
                 return NotFound($"Ingredient with ID {id} not found.");
