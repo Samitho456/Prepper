@@ -3,6 +3,7 @@ using Supabase.Postgrest.Models;
 
 namespace Prepper.Models
 {
+    [Table("nutritional_profiles")]
     public class NutritionalProfile : BaseModel
     {
         // Id of the nutritional profile
@@ -49,6 +50,9 @@ namespace Prepper.Models
         [Column("carb_sugar")]
         public float? CarbohydrateSugars { get; set; }
 
+        [Column("fiber")]
+        public float? Fiber { get; set; }
+
         // protein in nutritional profile
         [Column("protein")]
         public float? Protein { get; set; }
@@ -59,7 +63,7 @@ namespace Prepper.Models
 
 
         // Parameterized constructor
-        public NutritionalProfile(int id, DateTimeOffset createdAt, int unit_amount, string base_unit, float energyKcal, float energyKj, float fatTotal, float fatSaturated, float carbohydrateTotal, float carbohydrateSugars, float protein, float salt)
+        public NutritionalProfile(int id, DateTimeOffset createdAt, int unit_amount, string base_unit, float energyKcal, float energyKj, float fatTotal, float fatSaturated, float carbohydrateTotal, float carbohydrateSugars, float protein, float salt, float fiber)
         {
             Id = id;
             CreatedAt = createdAt;
@@ -73,6 +77,7 @@ namespace Prepper.Models
             CarbohydrateSugars = carbohydrateSugars;
             Protein = protein;
             Salt = salt;
+            Fiber = fiber;
         }
 
         // Default constructor
@@ -81,9 +86,7 @@ namespace Prepper.Models
         // Override ToString for better readability
         public override string ToString()
         {
-            return $"Kcal: {Kcal}, Kj: {Kj}, Fat: {FatTotal} \n" +
-                $"Saturated Fat: {FatSaturated}, Carbohydrates: {CarbohydrateTotal} \n" +
-                $"Carbonhydrates Sugar: {CarbohydrateSugars}, Protein: {Protein}, Salt: {Salt}";
+            return $"Id: {Id}, CreatedAt: {CreatedAt}, IngredientId: {IngredientId}, UnitAmount: {UnitAmount}, BaseUnit: {BaseUnit}, Kcal: {Kcal}, Kj: {Kj}, FatTotal: {FatTotal}, FatSaturated: {FatSaturated}, CarbohydrateTotal: {CarbohydrateTotal}, CarbohydrateSugars: {CarbohydrateSugars}, Protein: {Protein}, Salt: {Salt}, Fiber: {Fiber}";
         }
     }
 }

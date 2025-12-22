@@ -27,6 +27,7 @@ if (useSupabaseDB)
     
     // Register the repository
     builder.Services.AddScoped<IRepositoryDB<Ingredient>, IngredientDBRepo>();
+    builder.Services.AddScoped<IRepositoryDB<NutritionalProfile>, NutritionalProfileDBRepo>();
 }
 else
 {

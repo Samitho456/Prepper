@@ -8,14 +8,6 @@ namespace PrepperApi.Controllers
     [Route("api/[Controller]")]
     public class IngredientController : Controller
     {
-        //private IRepository<Ingredient> _ingredientsRepo;
-        //public IngredientController(IRepository<Ingredient> ingrediantRepo) 
-        //{ 
-        //    _ingredientsRepo = ingrediantRepo;
-        //    _ingredientsRepo.Add(new Ingredient(0, "Ingredient 1", UnitEnum.Unit.Gram, new NutritionalProfile(50, 200, 0.2f, 0.05f, 10f, 2f, 1f, 0.1f)));
-        //    _ingredientsRepo.Add(new Ingredient(0, "Ingredient 2", UnitEnum.Unit.Milliliter, new NutritionalProfile(30, 125, 0.1f, 0.02f, 5f, 1f, 0.5f, 0.05f)));
-        //}
-
         // Using the database repository
         private readonly IRepositoryDB<Ingredient> _ingredientsRepo;
 
@@ -77,8 +69,13 @@ namespace PrepperApi.Controllers
         /// resource.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] IngredientDTO ingredientDTO)
         {
+            if (ingredientDTO == null)
+            {
+                return BadRequest("Ingredient data is required.");
+            }
             // Map DTO to Model
             var ingredient = new Ingredient
             {
