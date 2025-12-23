@@ -1,15 +1,27 @@
 ﻿using Prepper.Models;
 using Supabase;
 using Supabase.Postgrest;
-using static Supabase.Postgrest.QueryOptions;
+using System.Linq.Expressions;
+using static Supabase.Postgrest.Constants;
 
 namespace Prepper.Repositories
 {
     public class IngredientDBRepo : IRepositoryDB<Ingredient>
     {
         private readonly Supabase.Client _supabase;
+        private readonly Dictionary<string, Expression<Func<Ingredient, object>>> sortColumns =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "name", i => i.Name },
+                { "createdat", i => i.CreatedAt }
+            };
+
         public IngredientDBRepo(Supabase.Client supabase)
         {
+            if (supabase == null)
+            {
+                throw new ArgumentNullException(nameof(supabase));
+            }
             _supabase = supabase;
         }
 
@@ -58,62 +70,29 @@ namespace Prepper.Repositories
         /// <see cref="Ingredient"/> objects. The collection will be empty if no ingredients are found.</returns>
         public async Task<IEnumerable<Ingredient>> GetAllAsync(string sortBy = null, bool ascending = false)
         {
-            if(sortBy == null)
-            {
-                // Retrieve all ingredients from the database
-                var result = await _supabase.From<Ingredient>().Get();
+            // Base query
+            var query = _supabase.From<Ingredient>().Select("*");
 
-                // Return the list of ingredients
-                return result.Models;
-            }
-            // Sort by name of the ingredient
-            else if (sortBy.ToLower() == "name")
+            // Apply sorting if sortBy is provided
+            if (!string.IsNullOrWhiteSpace(sortBy))
             {
-                // Sorts the names Ascending
-                if (ascending)
+                // Validate sortBy parameter
+                if (!sortColumns.TryGetValue(sortBy, out var sortColumn))
                 {
-                    var result = await _supabase.From<Ingredient>()
-                        .Select(i => new object[] { i.Id, i.Name })
-                        .Order(i => i.Name, Supabase.Postgrest.Constants.Ordering.Ascending)
-                        .Get();
-                    return result.Models;
+                    throw new ArgumentException($"Invalid sortBy column: {sortBy}");
                 }
-                // Sorts the name Descending
-                else
-                {
-                    var result = await _supabase.From<Ingredient>()
-                        .Select(i => new object[] { i.Id, i.Name })
-                        .Order(i => i.Name, Supabase.Postgrest.Constants.Ordering.Descending)
-                        .Get();
-                    return result.Models;
-                }
+
+                // Determine sort direction
+                var direction = ascending ? Ordering.Ascending : Ordering.Descending;
+
+                // Apply sorting to the query
+                query = query
+                    .Select(i => new object[] { i.Id, i.Name, i.CreatedAt })
+                    .Order(sortColumn, direction);
             }
-            // Sort by time added to supabase
-            else if (sortBy.ToLower() == "createdat")
-            {
-                // Sorts the ingredents by newest first
-                if (ascending)
-                {
-                    var result = await _supabase.From<Ingredient>()
-                        .Select(i => new object[] { i.Id, i.Name })
-                        .Order(i => i.CreatedAt, Supabase.Postgrest.Constants.Ordering.Ascending)
-                        .Get();
-                    return result.Models;
-                }
-                // Sorts the ingredients by oldest first
-                else
-                {
-                    var result = await _supabase.From<Ingredient>()
-                        .Select(i => new object[] { i.Id, i.Name })
-                        .Order(i => i.CreatedAt, Supabase.Postgrest.Constants.Ordering.Descending)
-                        .Get();
-                    return result.Models;
-                }
-            }
-            else
-            {
-                throw new ArgumentException("Invalid sortBy parameter");
-            }
+            // Execute the query and return the results
+            var result = await query.Get();
+            return result.Models;
         }
 
         /// <summary>
@@ -143,9 +122,9 @@ namespace Prepper.Repositories
         {
             // Update the ingredient with the specified ID
             var result = await _supabase.From<Ingredient>().Where(i => i.Id == id).Update(item);
-            if (result.Models.Count == 0 || result == null)
+            if (result == null || result.Models.Count == 0)
             {
-                throw new ArgumentNullException(nameof(result), "Ingredient not found");
+                return null;
             }
 
             // Return the updated ingredient

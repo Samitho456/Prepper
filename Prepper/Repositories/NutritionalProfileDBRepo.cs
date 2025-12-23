@@ -12,7 +12,7 @@ namespace Prepper.Repositories
     {
         private readonly Supabase.Client _supabase;
 
-        private static readonly Dictionary<string, Expression<Func<NutritionalProfile, object>>> sortColums =
+        private static readonly Dictionary<string, Expression<Func<NutritionalProfile, object>>> sortColumns =
             new(StringComparer.OrdinalIgnoreCase)
             {
                 { "kcal", i => i.Kcal },
@@ -23,7 +23,8 @@ namespace Prepper.Repositories
                 { "carbs_total", i => i.CarbohydrateTotal },
                 { "carbs_sugars", i => i.CarbohydrateSugars },
                 { "fiber", i => i.Fiber },
-                { "salt", i => i.Salt }
+                { "salt", i => i.Salt },
+                { "createdat", i => i.CreatedAt }
             };
         public NutritionalProfileDBRepo(Supabase.Client supabase)
         {
@@ -64,32 +65,26 @@ namespace Prepper.Repositories
 
         public async Task<IEnumerable<NutritionalProfile>> GetAllAsync(string sortBy = null, bool ascending = false)
         {
-            // Start with the base query. 
-            // We use the 'var' keyword here to let the compiler handle the internal Postgrest types.
+            // base query. 
             var query = _supabase.From<NutritionalProfile>().Select("*");
 
+            // Apply sorting if sortBy is provided
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
-                //Expression<Func<NutritionalProfile, object>> keySelector = sortBy.ToLower() switch
-                //{
-                //    "kcal" => i => i.Kcal,
-                //    "kj" => i => i.Kj,
-                //    "protein" => i => i.Protein,
-                //    _ => throw new ArgumentException($"Invalid sortBy parameter: {sortBy}")
-                //};
-
-                if (!sortColums.TryGetValue(sortBy, out var keySelector))
+                // Validate sortBy parameter
+                if (!sortColumns.TryGetValue(sortBy, out var sortColumn))
                 {
-                    throw new ArgumentException($"Invalid sortBy parameter: {sortBy}. " +
+                    throw new ArgumentException($"Invalid sortBy parametres: {sortBy}. " +
                         $"Possible parametres: kcal, kj, protein, fat_total, fat_saturated, carbs_total, carbs_sugars, fiber, salt");
                 }
 
+                // Determine sort direction
                 var direction = ascending ? Ordering.Ascending : Ordering.Descending;
 
-                // Re-assigning to 'query' works because .Order returns a compatible QueryBuilder
+                // Apply sorting to the query
                 query = query
                     .Select(i => new object[] { i.Id, i.UnitAmount, i.BaseUnit, i.Kcal, i.Kj, i.Protein, i.FatTotal, i.FatSaturated, i.CarbohydrateTotal, i.CarbohydrateSugars, i.Fiber, i.Salt })
-                    .Order(keySelector, direction);
+                    .Order(sortColumn, direction);
             }
 
             var result = await query.Get();
@@ -121,12 +116,12 @@ namespace Prepper.Repositories
         /// if the update is successful; otherwise, null.</returns>
         public async Task<NutritionalProfile?> UpdateAsync(int id, NutritionalProfile item)
         {
-            var restult = await _supabase.From<NutritionalProfile>().Where(np => np.Id == id).Update(item);
-            if(restult.Models.Count == 0)
+            var result = await _supabase.From<NutritionalProfile>().Where(np => np.Id == id).Update(item);
+            if(result == null || result.Models.Count == 0)
             {
                 return null;
             }
-            return restult.Models.FirstOrDefault();
+            return result.Models.FirstOrDefault();
         }
     }
 }

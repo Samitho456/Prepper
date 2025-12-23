@@ -34,12 +34,10 @@ else
     builder.Services.AddSingleton<IRepository<Ingredient>, IngrediantRepo>();
 }
 
+// Add services to the container.
+builder.Services.AddControllers();
 
-
-    // Add services to the container.
-
-    builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at htt)ps://aka.ms/aspnet/openapi
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 
 
