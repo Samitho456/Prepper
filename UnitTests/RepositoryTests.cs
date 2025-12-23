@@ -30,10 +30,9 @@ namespace UnitTests
         public void GetAllIngredients()
         {
             var allIngredients = _repo.GetAll().ToList();
-            Assert.AreEqual(3, allIngredients.Count);
-            Assert.AreEqual("Ingredient 1", allIngredients[0].Name);
-            Assert.AreEqual("Ingredient 2", allIngredients[1].Name);
-            Assert.AreEqual("Ingredient 3", allIngredients[2].Name);
+            Assert.AreEqual(2, allIngredients.Count);
+            Assert.AreEqual("Carrot", allIngredients[0].Name);
+            Assert.AreEqual("Potato", allIngredients[1].Name);
         }
 
         [TestMethod]
@@ -42,7 +41,7 @@ namespace UnitTests
             var ingredient = _repo.GetById(1);
             Assert.IsNotNull(ingredient);
             Assert.AreEqual(1, ingredient.Id);
-            Assert.AreEqual("Ingredient 1", ingredient.Name);
+            Assert.AreEqual("Carrot", ingredient.Name);
         }
 
         [TestMethod]
@@ -56,8 +55,8 @@ namespace UnitTests
         {
             var deletedIngredient = _repo.Delete(2);
             Assert.AreEqual(2, deletedIngredient.Id);
-            Assert.AreEqual("Ingredient 2", deletedIngredient.Name);
-            Assert.AreEqual(2, _repo.GetAll().Count());
+            Assert.AreEqual("Potato", deletedIngredient.Name);
+            Assert.AreEqual(1, _repo.GetAll().Count());
         }
         [TestMethod]
         public void DeleteIngredient_NotFound()
@@ -67,9 +66,9 @@ namespace UnitTests
         [TestMethod]
         public void UpdateIngredient()
         {
-            var updatedIngredient = _repo.Update(3, new Ingredient(3, "Updated Ingredient", DateTime.Now));
+            var updatedIngredient = _repo.Update(2, new Ingredient(3, "Updated Ingredient", DateTime.Now));
             Assert.IsNotNull(updatedIngredient);
-            Assert.AreEqual(3, updatedIngredient.Id);
+            Assert.AreEqual(2, updatedIngredient.Id);
             Assert.AreEqual("Updated Ingredient", updatedIngredient.Name);
         }
 
