@@ -90,7 +90,7 @@ namespace PrepperApi.Controllers
             var createdIngredientResponse = new
             {
                 Id = createdIngredient.Id,
-                Name = createdIngredient.Name,
+                Name = createdIngredient.Name
             };
 
             // Return a CreatedAtAction response with the location of the new resource

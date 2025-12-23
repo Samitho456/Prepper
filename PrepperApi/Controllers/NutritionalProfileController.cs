@@ -7,16 +7,8 @@ using Prepper.DTOs;
 namespace PrepperApi.Controllers
 {
     [Route("api/[Controller]")]
-    public class NutritionalProfileController : Controller
+    public class NutritionalProfileController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo) : Controller
     {
-        // Using the database repository
-        private readonly IRepositoryDB<NutritionalProfile> _nutritionalProfileRepo;
-
-        // Constructor injection of the database repository
-        public NutritionalProfileController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo)
-        {
-            _nutritionalProfileRepo = nutritionalProfileRepo;
-        }
 
         /// <summary>
         /// Retrieves all nutritional profiles.
@@ -25,30 +17,35 @@ namespace PrepperApi.Controllers
         /// (OK).</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAll([FromQuery]string sortBy, bool ascending)
         {
-            // Retrieve all nutritional profiles from the repository
-            var nutritionalProfiles = await _nutritionalProfileRepo.GetAllAsync();
-            var nutritionalProfilesDTOs = nutritionalProfiles.Select(np => new NutritionalProfileDTO
+            try
             {
-                Id = np.Id,
-                CreatedAt = np.CreatedAt,
-                IngredientId = np.IngredientId,
-                UnitAmount = np.UnitAmount,
-                BaseUnit = np.BaseUnit,
-                Kcal = np.Kcal,
-                Kj = np.Kj,
-                FatTotal = np.FatTotal,
-                FatSaturated = np.FatSaturated,
-                CarbohydrateTotal = np.CarbohydrateTotal,
-                CarbohydrateSugars = np.CarbohydrateSugars,
-                Fiber = np.Fiber,
-                Protein = np.Protein,
-                Salt = np.Salt
-            });
-
-            // Return the list of nutritional profiles with a 200 OK status
-            return Ok(nutritionalProfilesDTOs);
+                // Retrieve all nutritional profiles from the repository
+                var nutritionalProfiles = await nutritionalProfileRepo.GetAllAsync(sortBy, ascending);
+                var nutritionalProfileDTOs = nutritionalProfiles.Select(np => new
+                {
+                    Id = np.Id,
+                    IngredientId = np.IngredientId,
+                    UnitAmount = np.UnitAmount,
+                    BaseUnit = np.BaseUnit,
+                    Kcal = np.Kcal,
+                    Kj = np.Kj,
+                    FatTotal = np.FatTotal,
+                    FatSaturated = np.FatSaturated,
+                    CarbohydrateTotal = np.CarbohydrateTotal,
+                    CarbohydrateSugars = np.CarbohydrateSugars,
+                    Fiber = np.Fiber,
+                    Protein = np.Protein,
+                    Salt = np.Salt
+                });
+                return Ok(nutritionalProfileDTOs);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -62,7 +59,7 @@ namespace PrepperApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
-            var nutritionalProfile = await _nutritionalProfileRepo.GetByIdAsync(id);
+            var nutritionalProfile = await nutritionalProfileRepo.GetByIdAsync(id);
             if (nutritionalProfile == null)
             {
                 return NotFound();
@@ -122,12 +119,11 @@ namespace PrepperApi.Controllers
                 Salt = nutritionalProfileDTO.Salt
             };
 
-            var CreatedNutritionalProfile = await _nutritionalProfileRepo.AddAsync(nutritionalProfile);
+            var CreatedNutritionalProfile = await nutritionalProfileRepo.AddAsync(nutritionalProfile);
 
-            var createdProfileDTO = new NutritionalProfileDTO
+            var createdProfileDTO = new
             {
                 Id = CreatedNutritionalProfile.Id,
-                CreatedAt = CreatedNutritionalProfile.CreatedAt,
                 IngredientId = CreatedNutritionalProfile.IngredientId,
                 UnitAmount = CreatedNutritionalProfile.UnitAmount,
                 BaseUnit = CreatedNutritionalProfile.BaseUnit,
@@ -169,7 +165,7 @@ namespace PrepperApi.Controllers
                 Protein = nutritionalProfileDTO.Protein,
                 Salt = nutritionalProfileDTO.Salt
             };
-            var result = await _nutritionalProfileRepo.UpdateAsync(id, updatedNutritionalProfile);
+            var result = await nutritionalProfileRepo.UpdateAsync(id, updatedNutritionalProfile);
 
             if (result == null)
             {

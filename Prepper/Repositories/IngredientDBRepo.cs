@@ -63,12 +63,11 @@ namespace Prepper.Repositories
                 // Retrieve all ingredients from the database
                 var result = await _supabase.From<Ingredient>().Get();
 
-                //// Return the list of ingredients
+                // Return the list of ingredients
                 return result.Models;
-            } 
-            else
+            }
             // Sort by name of the ingredient
-            if (sortBy.ToLower() == "name")
+            else if (sortBy.ToLower() == "name")
             {
                 // Sorts the names Ascending
                 if (ascending)

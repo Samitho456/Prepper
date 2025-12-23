@@ -1,13 +1,30 @@
 ﻿using Prepper.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
+using static Supabase.Postgrest.Constants;
+using Supabase.Postgrest;
 
 namespace Prepper.Repositories
 {
     public class NutritionalProfileDBRepo : IRepositoryDB<NutritionalProfile>
     {
         private readonly Supabase.Client _supabase;
+
+        private static readonly Dictionary<string, Expression<Func<NutritionalProfile, object>>> sortColums =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "kcal", i => i.Kcal },
+                { "kj", i => i.Kj },
+                { "protein", i => i.Protein },
+                { "fat_total", i => i.FatTotal },
+                { "fat_saturated", i => i.FatSaturated  },
+                { "carbs_total", i => i.CarbohydrateTotal },
+                { "carbs_sugars", i => i.CarbohydrateSugars },
+                { "fiber", i => i.Fiber },
+                { "salt", i => i.Salt }
+            };
         public NutritionalProfileDBRepo(Supabase.Client supabase)
         {
             _supabase = supabase ?? throw new ArgumentNullException(nameof(supabase));
@@ -45,14 +62,37 @@ namespace Prepper.Repositories
             return result;
         }
 
-        /// <summary>
-        /// Asynchronously retrieves all nutritional profiles from the data source.
-        /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of all <see
-        /// cref="NutritionalProfile"/> objects. The collection is empty if no profiles are found.</returns>
-        public async Task<IEnumerable<NutritionalProfile>> GetAllAsync(string sortBy = null, bool ascending = false )
+        public async Task<IEnumerable<NutritionalProfile>> GetAllAsync(string sortBy = null, bool ascending = false)
         {
-            var result = await _supabase.From<NutritionalProfile>().Get();
+            // Start with the base query. 
+            // We use the 'var' keyword here to let the compiler handle the internal Postgrest types.
+            var query = _supabase.From<NutritionalProfile>().Select("*");
+
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                //Expression<Func<NutritionalProfile, object>> keySelector = sortBy.ToLower() switch
+                //{
+                //    "kcal" => i => i.Kcal,
+                //    "kj" => i => i.Kj,
+                //    "protein" => i => i.Protein,
+                //    _ => throw new ArgumentException($"Invalid sortBy parameter: {sortBy}")
+                //};
+
+                if (!sortColums.TryGetValue(sortBy, out var keySelector))
+                {
+                    throw new ArgumentException($"Invalid sortBy parameter: {sortBy}. " +
+                        $"Possible parametres: kcal, kj, protein, fat_total, fat_saturated, carbs_total, carbs_sugars, fiber, salt");
+                }
+
+                var direction = ascending ? Ordering.Ascending : Ordering.Descending;
+
+                // Re-assigning to 'query' works because .Order returns a compatible QueryBuilder
+                query = query
+                    .Select(i => new object[] { i.Id, i.UnitAmount, i.BaseUnit, i.Kcal, i.Kj, i.Protein, i.FatTotal, i.FatSaturated, i.CarbohydrateTotal, i.CarbohydrateSugars, i.Fiber, i.Salt })
+                    .Order(keySelector, direction);
+            }
+
+            var result = await query.Get();
             return result.Models;
         }
 

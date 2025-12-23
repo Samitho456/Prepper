@@ -11,7 +11,7 @@ namespace Prepper.Models
         public int Id { get; set; }
 
         // Timestamp of when the ingredient was created
-        [Column("created_at")]
+        [Column("created_at", ignoreOnInsert: true)]
         public DateTimeOffset CreatedAt { get; set; }
 
         // Foreign key to ingrdient
