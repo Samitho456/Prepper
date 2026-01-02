@@ -7,6 +7,7 @@ using Prepper.DTOs;
 namespace PrepperApi.Controllers
 {
     [Route("api/[Controller]")]
+    [ApiController]
     public class NutritionalProfileController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo) : Controller
     {
 
