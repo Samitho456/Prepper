@@ -24,9 +24,10 @@ namespace PrepperApi.Controllers
             {
                 // Retrieve all nutritional profiles from the repository
                 var nutritionalProfiles = await nutritionalProfileRepo.GetAllAsync(sortBy, ascending);
-                var nutritionalProfileDTOs = nutritionalProfiles.Select(np => new
+                var nutritionalProfileDTOs = nutritionalProfiles.Select(np => new NutritionalProfileDTO
                 {
                     Id = np.Id,
+                    CreatedAt = np.CreatedAt,
                     IngredientId = np.IngredientId,
                     UnitAmount = np.UnitAmount,
                     BaseUnit = np.BaseUnit,
@@ -121,9 +122,10 @@ namespace PrepperApi.Controllers
 
             var CreatedNutritionalProfile = await nutritionalProfileRepo.AddAsync(nutritionalProfile);
 
-            var createdProfileDTO = new
+            var createdProfileDTO = new NutritionalProfileDTO
             {
                 Id = CreatedNutritionalProfile.Id,
+                CreatedAt = CreatedNutritionalProfile.CreatedAt,
                 IngredientId = CreatedNutritionalProfile.IngredientId,
                 UnitAmount = CreatedNutritionalProfile.UnitAmount,
                 BaseUnit = CreatedNutritionalProfile.BaseUnit,

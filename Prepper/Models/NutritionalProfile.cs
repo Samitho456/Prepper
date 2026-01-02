@@ -63,10 +63,11 @@ namespace Prepper.Models
 
 
         // Parameterized constructor
-        public NutritionalProfile(int id, DateTimeOffset createdAt, int unit_amount, string base_unit, float energyKcal, float energyKj, float fatTotal, float fatSaturated, float carbohydrateTotal, float carbohydrateSugars, float protein, float salt, float fiber)
+        public NutritionalProfile(int id, DateTimeOffset createdAt, int ingredientId, int unit_amount, string base_unit, float energyKcal, float energyKj, float fatTotal, float fatSaturated, float carbohydrateTotal, float carbohydrateSugars, float protein, float salt, float fiber)
         {
             Id = id;
             CreatedAt = createdAt;
+            IngredientId = ingredientId;
             UnitAmount = unit_amount;
             BaseUnit = base_unit;
             Kcal = energyKcal;
