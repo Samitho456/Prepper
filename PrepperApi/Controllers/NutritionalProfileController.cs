@@ -10,12 +10,15 @@ namespace PrepperApi.Controllers
     [ApiController]
     public class NutritionalProfileController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo) : Controller
     {
-
         /// <summary>
-        /// Retrieves all nutritional profiles.
+        /// Retrieves all nutritional profiles, optionally sorted by the specified field and order.
         /// </summary>
-        /// <returns>An <see cref="IActionResult"/> containing a collection of all nutritional profiles with a status code of 200
-        /// (OK).</returns>
+        /// <param name="sortBy">The name of the property to sort the results by. Must correspond to a valid property of the nutritional
+        /// profile. If null or empty, the default sort order is applied.</param>
+        /// <param name="ascending">A value indicating whether the results should be sorted in ascending order. Set to <see langword="true"/>
+        /// for ascending order; otherwise, <see langword="false"/> for descending order.</param>
+        /// <returns>An <see cref="IActionResult"/> containing a collection of nutritional profile data transfer objects with
+        /// HTTP status code 200 (OK) if successful, or 400 (Bad Request) if the sort parameter is invalid.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

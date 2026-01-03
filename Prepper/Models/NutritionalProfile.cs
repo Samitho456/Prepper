@@ -15,7 +15,7 @@ namespace Prepper.Models
         public DateTimeOffset CreatedAt { get; set; }
 
         // Foreign key to ingrdient
-        [Column("ingredientid")]
+        [Column("ingredient_id")]
         public int IngredientId { get; set; }
 
         // The amount of the unit the nutritional profile refers to (e. g., 100, 34)

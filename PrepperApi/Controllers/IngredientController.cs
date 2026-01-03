@@ -9,11 +9,14 @@ namespace PrepperApi.Controllers
     [ApiController]
     public class IngredientController(IRepositoryDB<Ingredient> ingrediantRepo) : Controller
     {
-
         /// <summary>
-        /// Retrieves all ingredients.
+        /// Retrieves all ingredients, optionally sorted by the specified property and order.
         /// </summary>
-        /// <returns>An <see cref="IActionResult"/> containing a collection of all ingredients with a status code of 200 (OK).</returns>
+        /// <param name="sortBy">The name of the property to sort the results by. If null or empty, the default sort order is applied.</param>
+        /// <param name="ascending">A value indicating whether to sort the results in ascending order. Set to <see langword="true"/> for
+        /// ascending order; otherwise, <see langword="false"/> for descending order.</param>
+        /// <returns>An <see cref="IActionResult"/> containing a collection of ingredient data transfer objects (DTOs) with HTTP
+        /// status code 200 (OK) if successful, or 400 (Bad Request) if the sort parameter is invalid.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
