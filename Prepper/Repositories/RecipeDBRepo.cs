@@ -89,8 +89,8 @@ namespace Prepper.Repositories
             {
                 if (!sortColumns.TryGetValue(sortBy, out var sortColumn))
                 {
-                    throw new ArgumentException($"Invalid sortBy parametres: {sortBy}. " +
-                        $"Possible parametres: servings, meal_type, title, createdat");
+                    throw new ArgumentException($"Invalid sortBy parameters: {sortBy}. " +
+                        $"Possible parameters: servings, meal_type, title, createdat");
                 }
 
                 var direction = ascending ? Ordering.Ascending : Ordering.Descending;
