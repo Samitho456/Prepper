@@ -1,5 +1,5 @@
 using Prepper.Models;
-namespace UnitTests
+namespace UnitTests.ModelTests
 {
     [TestClass]
     public class IngredientModelTests

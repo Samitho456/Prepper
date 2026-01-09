@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Prepper;
+using Prepper.DTOs;
 using Prepper.Models;
 using Prepper.Repositories;
-using Prepper.DTOs;
 
 namespace PrepperApi.Controllers
 {
@@ -10,16 +10,19 @@ namespace PrepperApi.Controllers
     [ApiController]
     public class NutritionalProfileController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo) : Controller
     {
-
         /// <summary>
-        /// Retrieves all nutritional profiles.
+        /// Retrieves all nutritional profiles, optionally sorted by the specified field and order.
         /// </summary>
-        /// <returns>An <see cref="IActionResult"/> containing a collection of all nutritional profiles with a status code of 200
-        /// (OK).</returns>
+        /// <param name="sortBy">The name of the property to sort the results by. Must correspond to a valid property of the nutritional
+        /// profile. If null or empty, the default sort order is applied.</param>
+        /// <param name="ascending">A value indicating whether the results should be sorted in ascending order. Set to <see langword="true"/>
+        /// for ascending order; otherwise, <see langword="false"/> for descending order.</param>
+        /// <returns>An <see cref="IActionResult"/> containing a collection of nutritional profile data transfer objects with
+        /// HTTP status code 200 (OK) if successful, or 400 (Bad Request) if the sort parameter is invalid.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll([FromQuery]string sortBy, bool ascending)
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy = "createdat", [FromQuery] bool ascending = true)
         {
             try
             {
@@ -144,7 +147,19 @@ namespace PrepperApi.Controllers
             return CreatedAtAction(nameof(Get), new { id = createdProfileDTO.Id }, createdProfileDTO);
         }
 
+
+        /// <summary>
+        /// Updates the nutritional profile with the specified identifier using the provided data.
+        /// </summary>
+        /// <param name="id">The unique identifier of the nutritional profile to update.</param>
+        /// <param name="nutritionalProfileDTO">The data transfer object containing the updated nutritional profile information. Cannot be null.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the update operation. Returns <see
+        /// cref="OkObjectResult"/> with the updated profile if successful, <see cref="BadRequestObjectResult"/> if the
+        /// input data is invalid, or <see cref="NotFoundResult"/> if the profile does not exist.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] NutritionalProfileDTO nutritionalProfileDTO)
         {
             if (nutritionalProfileDTO == null)

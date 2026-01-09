@@ -1,8 +1,8 @@
-using Prepper;
-using Prepper.Repositories;
 using DotNetEnv;
-using Supabase;
+using Prepper;
 using Prepper.Models;
+using Prepper.Repositories;
+using Supabase;
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env file
@@ -24,10 +24,13 @@ if (useSupabaseDB)
 
     // Register the Client as a Singleton
     builder.Services.AddSingleton(provider => new Supabase.Client(url!, key!, options));
-    
+
     // Register the repository
     builder.Services.AddScoped<IRepositoryDB<Ingredient>, IngredientDBRepo>();
     builder.Services.AddScoped<IRepositoryDB<NutritionalProfile>, NutritionalProfileDBRepo>();
+    builder.Services.AddScoped<IRepositoryDB<Recipe>, RecipeDBRepo>();
+    builder.Services.AddScoped<IRepositoryDB<RecipeIngredients>, RecipeIngredientDBRepo>();
+    builder.Services.AddScoped<IRepositoryDB<RecipeInstruction>, RecipeInstructionDBRepo>();
 }
 else
 {

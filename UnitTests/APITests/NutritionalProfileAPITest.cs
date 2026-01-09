@@ -44,6 +44,34 @@ public class NutritionalProfileAPITest
     }
 
     [TestMethod]
+    public async Task GetAll_ReturnsOkResult_WithEmptyList_WhenNoProfilesExist()
+    {
+        // Arrange
+        _mockRepo.Setup(repo => repo.GetAllAsync(It.IsAny<string>(), It.IsAny<bool>()))
+                 .ReturnsAsync(new List<NutritionalProfile>());
+        // Act
+        var result = await _controller.GetAll(null, false);
+        // Assert
+        var okResult = result as OkObjectResult;
+        Assert.IsNotNull(okResult);
+        var returnValue = okResult.Value as IEnumerable<NutritionalProfileDTO>;
+        Assert.IsNotNull(returnValue);
+        Assert.AreEqual(0, returnValue.Count());
+    }
+
+    [TestMethod]
+    public async Task GetAll_ArgumentException_fails()
+    {
+        // Arrange
+        _mockRepo.Setup(repo => repo.GetAllAsync(It.IsAny<string>(), It.IsAny<bool>()))
+                 .ThrowsAsync(new ArgumentException("Invalid sort property"));
+        // Act
+        var result = await _controller.GetAll("invalid", false);
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
     public async Task Get_ReturnsOkResult_WithNutritionalProfileDTO()
     {
         // Arrange

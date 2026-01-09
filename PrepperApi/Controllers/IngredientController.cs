@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Prepper;
-using Prepper.Models;
 using Prepper.DTOs;
+using Prepper.Models;
+using Prepper.Repositories;
 
 namespace PrepperApi.Controllers
 {
@@ -9,15 +10,18 @@ namespace PrepperApi.Controllers
     [ApiController]
     public class IngredientController(IRepositoryDB<Ingredient> ingrediantRepo) : Controller
     {
-
         /// <summary>
-        /// Retrieves all ingredients.
+        /// Retrieves all ingredients, optionally sorted by the specified property and order.
         /// </summary>
-        /// <returns>An <see cref="IActionResult"/> containing a collection of all ingredients with a status code of 200 (OK).</returns>
+        /// <param name="sortBy">The name of the property to sort the results by. If null or empty, the default sort order is applied.</param>
+        /// <param name="ascending">A value indicating whether to sort the results in ascending order. Set to <see langword="true"/> for
+        /// ascending order; otherwise, <see langword="false"/> for descending order.</param>
+        /// <returns>An <see cref="IActionResult"/> containing a collection of ingredient data transfer objects (DTOs) with HTTP
+        /// status code 200 (OK) if successful, or 400 (Bad Request) if the sort parameter is invalid.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll([FromQuery] string sortBy, bool ascending)
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy = "name", [FromQuery] bool ascending = true)
         {
             try
             {
@@ -35,6 +39,55 @@ namespace PrepperApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Retrieves the nutritional profile information for the specified ingredient.
+        /// </summary>
+        /// <param name="id">The unique identifier of the ingredient for which to retrieve the nutritional profile. Must be a non-zero
+        /// value.</param>
+        /// <returns>An <see cref="IActionResult"/> containing a collection of nutritional profile data for the specified
+        /// ingredient with a status code 200 (OK) if found; 400 (Bad Request) if <paramref name="id"/> is zero; or 404
+        /// (Not Found) if no nutritional profile exists for the given ingredient.</returns>
+        [HttpGet("{id}/GetNutritionalProfile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetNutritionalProfile(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest("Ingredient ID is required.");
+            }
+
+            var repo = (IngredientDBRepo)ingrediantRepo;
+
+            var nutritionalProfile = await repo.GetNutritionalProfilesByIdAsync(id);
+
+            if (nutritionalProfile == null || !nutritionalProfile.Any())
+            {
+                return NotFound($"Nutritional profile for Ingredient ID {id} not found.");
+            }
+
+            var nutritionalProfileDTOs = nutritionalProfile.Select(np => new NutritionalProfileDTO
+            {
+                Id = np.Id,
+                IngredientId = np.IngredientId,
+                UnitAmount = np.UnitAmount,
+                BaseUnit = np.BaseUnit,
+                Kcal = np.Kcal,
+                Kj = np.Kj,
+                FatTotal = np.FatTotal,
+                FatSaturated = np.FatSaturated,
+                CarbohydrateTotal = np.CarbohydrateTotal,
+                CarbohydrateSugars = np.CarbohydrateSugars,
+                Fiber = np.Fiber,
+                Protein = np.Protein,
+                Salt = np.Salt,
+                CreatedAt = np.CreatedAt
+            });
+
+            return Ok(nutritionalProfileDTOs);
         }
 
         /// <summary>
