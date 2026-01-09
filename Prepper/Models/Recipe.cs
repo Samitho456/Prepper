@@ -18,11 +18,11 @@ namespace Prepper.Models
         [Column("description")]
         public string Description { get; set; }
 
-        // Amount of servigs the Recipe make up
+        // Amount of servings the Recipe makes
         [Column("servings")]
         public int Servings { get; set; }
 
-        // Minutes is take to prepare the meal
+        // Minutes it takes to prepare the meal
         [Column("preparation_minutes")]
         public int PreparationTimeMinutes { get; set; }
 
