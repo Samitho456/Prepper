@@ -96,7 +96,7 @@ namespace Prepper.Repositories
                 var direction = ascending ? Ordering.Ascending : Ordering.Descending;
 
                 query = query
-                    .Select(r => new object[] { r.Id, r.Title, r.Description, r.Servings, r.MealType, r.CreatedAt })
+                    .Select(r => new object[] { r.Id, r.Title, r.Description, r.Servings, r.MealType, r.PreparationTimeMinutes, r.CreatedAt })
                     .Order(sortColumn, direction);
             }
 
