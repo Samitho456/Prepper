@@ -37,9 +37,22 @@ namespace UnitTests.APITests
             // Assert
             var okResult = result as OkObjectResult;
             Assert.IsNotNull(okResult);
-            var returnedInstructions = okResult.Value as IEnumerable<RecipeInstruction>;
+            var returnedInstructions = okResult.Value as IEnumerable<RecipeInstructionDTO>;
             Assert.IsNotNull(returnedInstructions);
             Assert.AreEqual(2, returnedInstructions.Count());
+        }
+
+        [TestMethod]
+        public async Task GetAll_ReturnsBadRequest_WhenInvalidSortBy()
+        {
+            // Arrange
+            _mockRepo.Setup(repo => repo.GetAllAsync("InvalidField", true)).ThrowsAsync(new ArgumentException("Invalid sort field"));
+            // Act
+            var result = await _controller.GetAll("InvalidField", true);
+            // Assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual("Invalid sort field", badRequestResult.Value);
         }
 
         [TestMethod]
@@ -55,7 +68,7 @@ namespace UnitTests.APITests
             // Assert
             var okResult = result as OkObjectResult;
             Assert.IsNotNull(okResult);
-            var returnedInstruction = okResult.Value as RecipeInstruction;
+            var returnedInstruction = okResult.Value as RecipeInstructionDTO;
             Assert.IsNotNull(returnedInstruction);
             Assert.AreEqual(1, returnedInstruction.Id);
         }
@@ -93,6 +106,17 @@ namespace UnitTests.APITests
         }
 
         [TestMethod]
+        public async Task Create_ReturnsBadRequest_WhenDTOIsNull()
+        {
+            // Act
+            var result = await _controller.Create(null);
+            // Assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual("RecipeInstructionDTO cannot be null", badRequestResult.Value);
+        }
+
+        [TestMethod]
         public async Task Update_ReturnsOkResult_WithUpdatedRecipeInstruction()
         {
             // Arrange
@@ -113,6 +137,42 @@ namespace UnitTests.APITests
         }
 
         [TestMethod]
+        public async Task Update_ReturnsBadRequest_WhenDTOIsNull()
+        {
+            // Act
+            var result = await _controller.Update(1, null);
+            // Assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual("Invalid recipe instruction data.", badRequestResult.Value);
+        }
+
+        [TestMethod]
+        public async Task Update_ReturnsBadRequest_WhenIdMismatch()
+        {
+            // Arrange
+            var instructionDto = new RecipeInstructionDTO { Id = 2, InstructionText = "Updated Instruction" };
+            // Act
+            var result = await _controller.Update(1, instructionDto);
+            // Assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual("Invalid recipe instruction data.", badRequestResult.Value);
+        }
+
+        [TestMethod]
+        public async Task Update_ReturnsNotFound_WhenInstructionDoesNotExist()
+        {
+            // Arrange
+            var instructionDto = new RecipeInstructionDTO { Id = 1, InstructionText = "Updated Instruction" };
+            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((RecipeInstruction)null);
+            // Act
+            var result = await _controller.Update(1, instructionDto);
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
+
+        [TestMethod]
         public async Task Delete_ReturnsOkResult_WithDeletedRecipeInstruction()
         {
             // Arrange
@@ -128,6 +188,17 @@ namespace UnitTests.APITests
             var returnedInstruction = okResult.Value as RecipeInstruction;
             Assert.IsNotNull(returnedInstruction);
             Assert.AreEqual(1, returnedInstruction.Id);
+        }
+
+        [TestMethod]
+        public async Task Delete_ReturnsNotFound_WhenInstructionDoesNotExist()
+        {
+            // Arrange
+            _mockRepo.Setup(repo => repo.DeleteAsync(1)).ReturnsAsync((RecipeInstruction)null);
+            // Act
+            var result = await _controller.Delete(1);
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
         }
     }
 }

@@ -43,6 +43,19 @@ namespace UnitTests.APITests
         }
 
         [TestMethod]
+        public async Task GetAll_ArgumentException_fails()
+        {
+            // Arrange
+            _mockRepo.Setup(repo => repo.GetAllAsync(It.IsAny<string>(), It.IsAny<bool>())).ThrowsAsync(new ArgumentException("Invalid argument"));
+            // Act
+            var result = await _controller.GetAll("invalid", true);
+            // Assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual("Invalid argument", badRequestResult.Value);
+        }
+
+        [TestMethod]
         public async Task Get_ReturnsOkResult_WithRecipe()
         {
             // Arrange
@@ -93,6 +106,15 @@ namespace UnitTests.APITests
         }
 
         [TestMethod]
+        public async Task Create_ReturnsBadRequest_WhenDTOIsNull()
+        {
+            // Act
+            var result = await _controller.Create(null);
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+        }
+
+        [TestMethod]
         public async Task Update_ReturnsOkResult_WithUpdatedRecipe()
         {
             // Arrange
@@ -113,6 +135,26 @@ namespace UnitTests.APITests
         }
 
         [TestMethod]
+        public async Task Update_ReturnsBadRequest_WhenRecipeDTOIsNull()
+        {
+            // Act
+            var result = await _controller.Update(1, null);
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+        }
+
+        [TestMethod]
+        public async Task Update_ReturnsNotFound_WhenRecipeDoesNotExist()
+        {
+            // Arrange
+            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((Recipe)null);
+            // Act
+            var result = await _controller.Update(1, new RecipeDTO { Title = "Updated Recipe" });
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
+
+        [TestMethod]
         public async Task Delete_ReturnsOkResult_WithDeletedRecipe()
         {
             // Arrange
@@ -128,6 +170,17 @@ namespace UnitTests.APITests
             var returnedRecipe = okResult.Value as RecipeDTO;
             Assert.IsNotNull(returnedRecipe);
             Assert.AreEqual(1, returnedRecipe.Id);
+        }
+
+        [TestMethod]
+        public async Task Delete_ReturnsNotFound_WhenRecipeDoesNotExist()
+        {
+            // Arrange
+            _mockRepo.Setup(repo => repo.DeleteAsync(1)).ReturnsAsync((Recipe)null);
+            // Act
+            var result = await _controller.Delete(1);
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
         }
     }
 }

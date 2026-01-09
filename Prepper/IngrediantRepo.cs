@@ -1,7 +1,4 @@
 ﻿using Prepper.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Prepper
 {
@@ -9,8 +6,8 @@ namespace Prepper
     {
         private int _nextId = 1;
         private List<Ingredient> _repository;
-        public IngrediantRepo() 
-        { 
+        public IngrediantRepo()
+        {
             _repository = new List<Ingredient>();
         }
         /// <summary>
@@ -36,7 +33,7 @@ namespace Prepper
         public Ingredient? Delete(int id)
         {
             var ingredient = GetById(id);
-            if(ingredient == null)
+            if (ingredient == null)
             {
                 throw new KeyNotFoundException($"Ingredient with ID {id} not found.");
             }
@@ -63,7 +60,7 @@ namespace Prepper
         public Ingredient? GetById(int id)
         {
             var ingredient = _repository.Find(i => i.Id == id);
-            if(ingredient == null)
+            if (ingredient == null)
             {
                 throw new KeyNotFoundException($"Ingredient with ID {id} not found.");
             }
@@ -80,7 +77,7 @@ namespace Prepper
         public Ingredient? Update(int id, Ingredient item)
         {
             var existingIngredient = GetById(id);
-            if(existingIngredient == null)
+            if (existingIngredient == null)
             {
                 throw new KeyNotFoundException($"Ingredient with ID {id} not found.");
             }

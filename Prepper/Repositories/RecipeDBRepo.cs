@@ -1,9 +1,5 @@
 ﻿using Prepper.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq.Expressions;
-using Supabase.Postgrest;
 using static Supabase.Postgrest.Constants;
 
 namespace Prepper.Repositories
@@ -59,7 +55,7 @@ namespace Prepper.Repositories
             var result = await GetByIdAsync(id);
 
             // Returns null if no object is found
-            if(result == null)
+            if (result == null)
             {
                 return null;
             }
@@ -91,7 +87,7 @@ namespace Prepper.Repositories
 
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
-                if(!sortColumns.TryGetValue(sortBy, out var sortColumn))
+                if (!sortColumns.TryGetValue(sortBy, out var sortColumn))
                 {
                     throw new ArgumentException($"Invalid sortBy parametres: {sortBy}. " +
                         $"Possible parametres: servings, meal_type, title, createdat");
@@ -143,7 +139,7 @@ namespace Prepper.Repositories
                 .Update(item);
 
             // Returns null if the item does not exist
-            if(result == null || result.Models.Count == 0)
+            if (result == null || result.Models.Count == 0)
             {
                 return null;
             }

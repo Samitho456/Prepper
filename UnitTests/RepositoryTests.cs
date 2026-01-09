@@ -1,5 +1,5 @@
-﻿using Prepper.Models;
-using Prepper;
+﻿using Prepper;
+using Prepper.Models;
 
 namespace UnitTests
 {
@@ -19,7 +19,7 @@ namespace UnitTests
         [TestMethod]
         public void AddIngredientToRepo()
         {
-            var ingredient = new Ingredient(1, "Test Ingredient",DateTime.Now);
+            var ingredient = new Ingredient(1, "Test Ingredient", DateTime.Now);
             var addedIngredient = _repo.Add(ingredient);
             Assert.IsNotNull(addedIngredient);
             Assert.AreEqual(ingredient.Id, addedIngredient.Id);

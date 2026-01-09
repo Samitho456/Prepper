@@ -1,11 +1,9 @@
 ﻿using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Prepper.Models
 {
+    [Table("recipes")]
     public class Recipe : BaseModel
     {
         // Id of the Recipe

@@ -1,7 +1,4 @@
 ﻿using Prepper.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using static Supabase.Postgrest.Constants;
 
 namespace Prepper.Repositories
@@ -81,9 +78,9 @@ namespace Prepper.Repositories
                 .From<RecipeInstruction>()
                 .Select("*");
 
-            if(!string.IsNullOrEmpty(sortBy))
+            if (!string.IsNullOrEmpty(sortBy))
             {
-                if(!sortColumns.TryGetValue(sortBy, out var sortcolumn))
+                if (!sortColumns.TryGetValue(sortBy, out var sortcolumn))
                 {
                     throw new ArgumentException($"Invalid sortBy value: {sortBy}");
                 }
@@ -129,10 +126,10 @@ namespace Prepper.Repositories
             // Updates the row in Supabase
             var result = await _supabase
                 .From<RecipeInstruction>()
-                .Where (ri => ri.Id == id)
+                .Where(ri => ri.Id == id)
                 .Update(item);
 
-            if(result == null || result.Models.Count == 0)
+            if (result == null || result.Models.Count == 0)
             {
                 return null;
             }

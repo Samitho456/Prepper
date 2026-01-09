@@ -1,11 +1,9 @@
 ﻿using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Prepper.Models
 {
+    [Table("recipe_ingredients")]
     public class RecipeIngredients : BaseModel
     {
         // Unique identifier for the recipe ingredient entry

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
@@ -22,7 +21,7 @@ namespace PrepperApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll([FromQuery] string sortBy, bool ascending)
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy = "title", [FromQuery] bool ascending = true)
         {
             try
             {
@@ -150,10 +149,6 @@ namespace PrepperApi.Controllers
 
             // Update the recipe in the repository and get the updated recipe
             var updatedRecipe = await recipeRepo.UpdateAsync(id, existingRecipe);
-            if (updatedRecipe == null)
-            {
-                return NotFound($"Recipe with ID {id} not found.");
-            }
 
             // Map the updated Recipe model back to RecipeDTO
             var updatedRecipeDTO = new RecipeDTO

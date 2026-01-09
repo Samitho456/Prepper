@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
@@ -21,12 +20,22 @@ namespace PrepperApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll([FromQuery] string sortBy, bool ascending)
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy = "recipeid", [FromQuery] bool ascending = true)
         {
             try
             {
                 var recipeInstructions = await recipeInstructionRepo.GetAllAsync(sortBy, ascending);
-                return Ok(recipeInstructions);
+
+                var recipeInstructionDTOs = recipeInstructions.Select(ri => new RecipeInstructionDTO
+                {
+                    Id = ri.Id,
+                    RecipeId = ri.RecipeId,
+                    StepNumber = ri.StepNumber,
+                    InstructionText = ri.InstructionText,
+                    CreatedAt = ri.CreatedAt
+                });
+
+                return Ok(recipeInstructionDTOs);
             }
             catch (Exception ex)
             {
@@ -56,7 +65,16 @@ namespace PrepperApi.Controllers
                 return NotFound($"Instruction with id {id} not found");
             }
 
-            return Ok(result);
+            var recipeInstructionDTO = new RecipeInstructionDTO
+            {
+                Id = result.Id,
+                RecipeId = result.RecipeId,
+                StepNumber = result.StepNumber,
+                InstructionText = result.InstructionText,
+                CreatedAt = result.CreatedAt
+            };
+
+            return Ok(recipeInstructionDTO);
         }
 
         /// <summary>

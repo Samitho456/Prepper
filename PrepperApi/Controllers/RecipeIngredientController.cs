@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
@@ -13,7 +12,7 @@ namespace PrepperApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll([FromQuery] string sortBy, bool ascending)
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy = "recipeid", [FromQuery] bool ascending = true)
         {
             try
             {
@@ -24,6 +23,7 @@ namespace PrepperApi.Controllers
                     RecipeId = ri.RecipeId,
                     IngredientId = ri.IngredientId,
                     Quantity = ri.Quantity,
+                    Unit = ri.Unit,
                     CreatedAt = ri.CreatedAt
                 });
 
@@ -51,6 +51,7 @@ namespace PrepperApi.Controllers
                 RecipeId = recipeIngredient.RecipeId,
                 IngredientId = recipeIngredient.IngredientId,
                 Quantity = recipeIngredient.Quantity,
+                Unit = recipeIngredient.Unit,
                 CreatedAt = recipeIngredient.CreatedAt
             };
             return Ok(recipeIngredientDTO);
@@ -66,11 +67,17 @@ namespace PrepperApi.Controllers
                 return BadRequest("RecipeIngredient data is required.");
             }
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var recipeIngredient = new RecipeIngredients
             {
                 RecipeId = recipeIngredientDTO.RecipeId,
                 IngredientId = recipeIngredientDTO.IngredientId,
-                Quantity = recipeIngredientDTO.Quantity
+                Quantity = recipeIngredientDTO.Quantity,
+                Unit = recipeIngredientDTO.Unit
             };
 
             var createdRecipeIngredient = await recipeIngredientRepo.AddAsync(recipeIngredient);
@@ -81,6 +88,7 @@ namespace PrepperApi.Controllers
                 RecipeId = createdRecipeIngredient.RecipeId,
                 IngredientId = createdRecipeIngredient.IngredientId,
                 Quantity = createdRecipeIngredient.Quantity,
+                Unit = createdRecipeIngredient.Unit,
                 CreatedAt = createdRecipeIngredient.CreatedAt
             };
 
@@ -90,13 +98,25 @@ namespace PrepperApi.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, [FromBody] RecipeIngredientDTO recipeIngredientDTO)
         {
+            if (recipeIngredientDTO == null)
+            {
+                return BadRequest("RecipeIngredient data is required.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var recipeIngredient = new RecipeIngredients
             {
                 RecipeId = recipeIngredientDTO.RecipeId,
                 IngredientId = recipeIngredientDTO.IngredientId,
-                Quantity = recipeIngredientDTO.Quantity
+                Quantity = recipeIngredientDTO.Quantity,
+                Unit = recipeIngredientDTO.Unit
             };
 
             var updatedRecipeIngredient = await recipeIngredientRepo.UpdateAsync(id, recipeIngredient);
@@ -110,6 +130,7 @@ namespace PrepperApi.Controllers
                 RecipeId = updatedRecipeIngredient.RecipeId,
                 IngredientId = updatedRecipeIngredient.IngredientId,
                 Quantity = updatedRecipeIngredient.Quantity,
+                Unit = updatedRecipeIngredient.Unit,
                 CreatedAt = updatedRecipeIngredient.CreatedAt
             };
             return Ok(updatedRecipeIngredientDTO);
@@ -131,6 +152,7 @@ namespace PrepperApi.Controllers
                 RecipeId = deletedRecipeIngredient.RecipeId,
                 IngredientId = deletedRecipeIngredient.IngredientId,
                 Quantity = deletedRecipeIngredient.Quantity,
+                Unit = deletedRecipeIngredient.Unit,
                 CreatedAt = deletedRecipeIngredient.CreatedAt
             };
             return Ok(deletedRecipeIngredientDTO);

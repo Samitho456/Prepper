@@ -1,6 +1,4 @@
 ﻿using Prepper.Models;
-using Supabase;
-using Supabase.Postgrest;
 using System.Linq.Expressions;
 using static Supabase.Postgrest.Constants;
 
@@ -108,6 +106,23 @@ namespace Prepper.Repositories
 
             // Return the found ingredient or null if not found
             return result;
+        }
+
+        /// <summary>
+        /// Asynchronously retrieves all nutritional profiles associated with the specified ingredient ID.
+        /// </summary>
+        /// <param name="id">The unique identifier of the ingredient for which to retrieve nutritional profiles.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of nutritional
+        /// profiles for the specified ingredient. The collection will be empty if no profiles are found.</returns>
+        public async Task<IEnumerable<NutritionalProfile?>> GetNutritionalProfilesByIdAsync(int id)
+        {
+            // Query the database for the nutritional profile with the specified ID
+            var result = await _supabase
+                .From<NutritionalProfile>()
+                .Where(np => np.IngredientId == id)
+                .Get();
+            // Return the found nutritional profile or null if not found
+            return result.Models;
         }
 
         /// <summary>

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Prepper;
+using Prepper.DTOs;
 using Prepper.Models;
 using Prepper.Repositories;
-using Prepper.DTOs;
 
 namespace PrepperApi.Controllers
 {
@@ -22,7 +22,7 @@ namespace PrepperApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll([FromQuery]string sortBy, bool ascending)
+        public async Task<IActionResult> GetAll([FromQuery] string sortBy = "createdat", [FromQuery] bool ascending = true)
         {
             try
             {
@@ -147,7 +147,19 @@ namespace PrepperApi.Controllers
             return CreatedAtAction(nameof(Get), new { id = createdProfileDTO.Id }, createdProfileDTO);
         }
 
+
+        /// <summary>
+        /// Updates the nutritional profile with the specified identifier using the provided data.
+        /// </summary>
+        /// <param name="id">The unique identifier of the nutritional profile to update.</param>
+        /// <param name="nutritionalProfileDTO">The data transfer object containing the updated nutritional profile information. Cannot be null.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the update operation. Returns <see
+        /// cref="OkObjectResult"/> with the updated profile if successful, <see cref="BadRequestObjectResult"/> if the
+        /// input data is invalid, or <see cref="NotFoundResult"/> if the profile does not exist.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] NutritionalProfileDTO nutritionalProfileDTO)
         {
             if (nutritionalProfileDTO == null)

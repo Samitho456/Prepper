@@ -1,10 +1,6 @@
 ﻿using Prepper.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using static Supabase.Postgrest.Constants;
-using Supabase.Postgrest;
 
 namespace Prepper.Repositories
 {
@@ -117,7 +113,7 @@ namespace Prepper.Repositories
         public async Task<NutritionalProfile?> UpdateAsync(int id, NutritionalProfile item)
         {
             var result = await _supabase.From<NutritionalProfile>().Where(np => np.Id == id).Update(item);
-            if(result == null || result.Models.Count == 0)
+            if (result == null || result.Models.Count == 0)
             {
                 return null;
             }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Prepper.Models;
+﻿using Prepper.Models;
 using System.Linq.Expressions;
 using static Supabase.Postgrest.Constants;
 
@@ -130,7 +127,17 @@ namespace Prepper.Repositories
         /// object if the update is successful; otherwise, null if the entry is not found or the update fails.</returns>
         public async Task<RecipeIngredients?> UpdateAsync(int id, RecipeIngredients item)
         {
+            // Check if the recipe ingredient exists first
+            var existing = await GetByIdAsync(id);
+            if (existing == null)
+            {
+                return null;
+            }
+
             // Ensure the item's ID matches the provided ID
+            item.Id = id;
+
+            // Perform the update
             var result = await _supabase
                 .From<RecipeIngredients>()
                 .Where(ri => ri.Id == id)
