@@ -60,7 +60,7 @@ namespace Prepper.Repositories
                 return null;
             }
 
-            // Delete the row in Supbase
+            // Delete the row in Supabase
             await _supabase
                 .From<Recipe>()
                 .Where(r => r.Id == id)
