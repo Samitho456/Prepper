@@ -26,7 +26,7 @@ namespace Prepper.Models
         [Column("preparation_minutes")]
         public int PreparationTimeMinutes { get; set; }
 
-        // The type of meal (e. g., Breakfast, Lunch, Dinner, Desert, etc.)
+        // The type of meal (e. g., Breakfast, Lunch, Dinner, Dessert, etc.)
         [Column("meal_type")]
         public string MealType { get; set; }
 
