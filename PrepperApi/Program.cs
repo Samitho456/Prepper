@@ -31,6 +31,7 @@ if (useSupabaseDB)
     builder.Services.AddScoped<IRepositoryDB<Recipe>, RecipeDBRepo>();
     builder.Services.AddScoped<IRepositoryDB<RecipeIngredients>, RecipeIngredientDBRepo>();
     builder.Services.AddScoped<IRepositoryDB<RecipeInstruction>, RecipeInstructionDBRepo>();
+    builder.Services.AddScoped<IRepositoryDB<MealPlan>, MealPlanDBRepo>();
 }
 else
 {
