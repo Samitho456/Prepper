@@ -26,7 +26,16 @@ namespace PrepperApi.Controllers
             try
             {
                 var recipes = await recipeRepo.GetAllAsync(sortBy, ascending);
-                return Ok(recipes);
+                var recipeDTOs = recipes.Select(r => new RecipeDTO
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    Servings = r.Servings,
+                    MealType = r.MealType,
+                    PreparationTimeMinutes = r.PreparationTimeMinutes,
+                    Description = r.Description
+                }).ToList();
+                return Ok(recipeDTOs);
             }
             catch (ArgumentException ex)
             {

@@ -186,7 +186,16 @@ namespace PrepperApi.Controllers
                 return NotFound($"Recipe instruction with ID {id} not found.");
             }
 
-            return Ok(deletedInstruction);
+            var deletedInstructionDTO = new RecipeInstructionDTO
+            {
+                Id = deletedInstruction.Id,
+                RecipeId = deletedInstruction.RecipeId,
+                StepNumber = deletedInstruction.StepNumber,
+                InstructionText = deletedInstruction.InstructionText,
+                CreatedAt = deletedInstruction.CreatedAt
+            };
+
+            return Ok(deletedInstructionDTO);
         }
     }
 }

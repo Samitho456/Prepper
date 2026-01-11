@@ -190,7 +190,25 @@ namespace PrepperApi.Controllers
                 return NotFound();
             }
 
-            return Ok(result);
+            var updatedNutritionalProfileDTO = new NutritionalProfileDTO
+            {
+                Id = result.Id,
+                CreatedAt = result.CreatedAt,
+                IngredientId = result.IngredientId,
+                UnitAmount = result.UnitAmount,
+                BaseUnit = result.BaseUnit,
+                Kcal = result.Kcal,
+                Kj = result.Kj,
+                FatTotal = result.FatTotal,
+                FatSaturated = result.FatSaturated,
+                CarbohydrateTotal = result.CarbohydrateTotal,
+                CarbohydrateSugars = result.CarbohydrateSugars,
+                Fiber = result.Fiber,
+                Protein = result.Protein,
+                Salt = result.Salt
+            };
+
+            return Ok(updatedNutritionalProfileDTO);
         }
     }
 }
