@@ -1,4 +1,5 @@
-﻿using Prepper.Models;
+﻿using Prepper.DTOs;
+using Prepper.Models;
 using System.Linq.Expressions;
 using static Supabase.Postgrest.Constants;
 
@@ -121,6 +122,73 @@ namespace Prepper.Repositories
                 .Single();
 
             return result;
+        }
+
+        public async Task<CompleteRecipeDTO> GetCompleteRecipe(int id)
+        {
+            var recipe = await _supabase
+                .From<Recipe>()
+                .Where(r => r.Id == id)
+                .Single();
+            
+            if (recipe == null)
+            {
+                return null;
+            }
+
+            var recipeIngredients = await _supabase
+                .From<RecipeIngredient>()
+                .Where(i => i.RecipeId == id)
+                .Get();
+
+            var ingredientIds = recipeIngredients.Models
+                .Select(ri => ri.IngredientId)
+                .ToList();
+
+            var allIngredients = await _supabase
+                .From<Ingredient>()
+                .Get();
+
+            var ingredients = allIngredients.Models
+                .Where(i => ingredientIds.Contains(i.Id))
+                .ToList();
+
+            var instructions = await _supabase
+                .From<RecipeInstruction>()
+                .Where(ri => ri.RecipeId == id)
+                .Order(ri => ri.StepNumber, Ordering.Ascending)
+                .Get();
+
+            return new CompleteRecipeDTO
+            {
+                Id = recipe.Id,
+                Title = recipe.Title,
+                Description = recipe.Description,
+                Servings = recipe.Servings,
+                PreparationTimeMinutes = recipe.PreparationTimeMinutes,
+                MealType = recipe.MealType,
+                CreatedAt = recipe.CreatedAt,
+                Ingredients = recipeIngredients.Models.Select(ri =>
+                {
+                    var ingredient = ingredients.FirstOrDefault(i => i.Id == ri.IngredientId);
+                    return new CompleteRecipeIngredientDTO
+                    {
+                        Id = ingredient.Id,
+                        Name = ingredient.Name,
+                        RecipeId = ri.RecipeId,
+                        IngredientId = ri.IngredientId,
+                        Quantity = ri.Quantity,
+                        Unit = ri.Unit,
+                        CreatedAt = ri.CreatedAt
+                    };
+                }).ToList(),
+                Instructions = instructions.Models.Select(ri => new RecipeInstructionDTO
+                {
+                    StepNumber = ri.StepNumber,
+                    InstructionText = ri.InstructionText,
+                    CreatedAt = ri.CreatedAt
+                }).ToList()
+            };
         }
 
         /// <summary>

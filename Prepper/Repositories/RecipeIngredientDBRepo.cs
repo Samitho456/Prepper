@@ -4,13 +4,13 @@ using static Supabase.Postgrest.Constants;
 
 namespace Prepper.Repositories
 {
-    public class RecipeIngredientDBRepo : IRepositoryDB<RecipeIngredients>
+    public class RecipeIngredientDBRepo : IRepositoryDB<RecipeIngredient>
     {
         // Dependency injection of Supabase client
         private readonly Supabase.Client _supabase;
 
         // Mapping of sortable columns for recipe ingredients
-        private readonly Dictionary<string, Expression<Func<RecipeIngredients, object>>> sortColumns =
+        private readonly Dictionary<string, Expression<Func<RecipeIngredient, object>>> sortColumns =
             new(StringComparer.OrdinalIgnoreCase)
             {
                 { "recipeid", ri => ri.RecipeId },
@@ -30,11 +30,11 @@ namespace Prepper.Repositories
         /// <param name="item">The recipe ingredient to add. Cannot be null.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the added recipe ingredient, or
         /// null if the operation did not succeed.</returns>
-        public async Task<RecipeIngredients> AddAsync(RecipeIngredients item)
+        public async Task<RecipeIngredient> AddAsync(RecipeIngredient item)
         {
             // Insert the new recipe ingredient into the database
             var result = await _supabase
-                .From<RecipeIngredients>()
+                .From<RecipeIngredient>()
                 .Insert(item);
 
             return result.Models.FirstOrDefault();
@@ -44,9 +44,9 @@ namespace Prepper.Repositories
         /// Deletes the recipe ingredient with the specified identifier asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the recipe ingredient to delete.</param>
-        /// <returns>A <see cref="RecipeIngredients"/> object representing the deleted recipe ingredient if found and deleted;
+        /// <returns>A <see cref="RecipeIngredient"/> object representing the deleted recipe ingredient if found and deleted;
         /// otherwise, <see langword="null"/> if no matching ingredient exists.</returns>
-        public async Task<RecipeIngredients?> DeleteAsync(int id)
+        public async Task<RecipeIngredient?> DeleteAsync(int id)
         {
             // Check if the recipe ingredient exists
             var result = await GetByIdAsync(id);
@@ -57,7 +57,7 @@ namespace Prepper.Repositories
 
             // Delete the recipe ingredient from the database
             await _supabase
-                .From<RecipeIngredients>()
+                .From<RecipeIngredient>()
                 .Where(ri => ri.Id == id)
                 .Delete();
             return result;
@@ -71,13 +71,13 @@ namespace Prepper.Repositories
         /// <param name="ascending">A value indicating whether to sort the results in ascending order. If <see langword="true"/>, results are
         /// sorted in ascending order; otherwise, in descending order.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
-        /// cref="RecipeIngredients"/> objects representing all recipe ingredients.</returns>
+        /// cref="RecipeIngredient"/> objects representing all recipe ingredients.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="sortBy"/> is specified and does not correspond to a valid sortable column.</exception>
-        public async Task<IEnumerable<RecipeIngredients>> GetAllAsync(string sortBy = null, bool ascending = false)
+        public async Task<IEnumerable<RecipeIngredient>> GetAllAsync(string sortBy = null, bool ascending = false)
         {
             // Start building the query to select all recipe ingredients
             var query = _supabase
-                .From<RecipeIngredients>()
+                .From<RecipeIngredient>()
                 .Select("*");
 
             // Apply sorting if a sortBy column is specified
@@ -106,12 +106,12 @@ namespace Prepper.Repositories
         /// </summary>
         /// <param name="id">The unique identifier of the recipe ingredients entry to retrieve.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the <see
-        /// cref="RecipeIngredients"/> entry if found; otherwise, <see langword="null"/>.</returns>
-        public async Task<RecipeIngredients?> GetByIdAsync(int id)
+        /// cref="RecipeIngredient"/> entry if found; otherwise, <see langword="null"/>.</returns>
+        public async Task<RecipeIngredient?> GetByIdAsync(int id)
         {
             // Retrieve the recipe ingredients entry by its unique identifier
             var result = await _supabase
-                .From<RecipeIngredients>()
+                .From<RecipeIngredient>()
                 .Where(ri => ri.Id == id)
                 .Single();
 
@@ -125,7 +125,7 @@ namespace Prepper.Repositories
         /// <param name="item">The updated values for the recipe ingredients entry. The item's Id property must match the provided id.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the updated RecipeIngredients
         /// object if the update is successful; otherwise, null if the entry is not found or the update fails.</returns>
-        public async Task<RecipeIngredients?> UpdateAsync(int id, RecipeIngredients item)
+        public async Task<RecipeIngredient?> UpdateAsync(int id, RecipeIngredient item)
         {
             // Check if the recipe ingredient exists first
             var existing = await GetByIdAsync(id);
@@ -139,7 +139,7 @@ namespace Prepper.Repositories
 
             // Perform the update
             var result = await _supabase
-                .From<RecipeIngredients>()
+                .From<RecipeIngredient>()
                 .Where(ri => ri.Id == id)
                 .Update(item);
 

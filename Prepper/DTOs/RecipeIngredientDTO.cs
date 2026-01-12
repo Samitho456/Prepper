@@ -15,8 +15,8 @@ namespace Prepper.DTOs
         public int IngredientId { get; set; }
         
         [Required(ErrorMessage = "Quantity is required")]
-        [StringLength(100, MinimumLength = 1, ErrorMessage = "Quantity must be between 1 and 100 characters")]
-        public string Quantity { get; set; }
+        [Range(0.0, double.MaxValue, ErrorMessage = "Quantity must be greater than or equal to 0")]
+        public double Quantity { get; set; }
         
         [Required(ErrorMessage = "Unit is required")]
         [StringLength(50, MinimumLength = 1, ErrorMessage = "Unit must be between 1 and 50 characters")]

@@ -2,6 +2,7 @@
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
+using Prepper.Repositories;
 
 namespace PrepperApi.Controllers
 {
@@ -72,6 +73,24 @@ namespace PrepperApi.Controllers
                 Description = recipe.Description,
             };
             return Ok(recipeDTO);
+        }
+
+        [HttpGet("/fullrecipe/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetFullRecipe(int id)
+        {
+            var repository = recipeRepo as RecipeDBRepo;
+            if (repository == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Repository does not support full recipe retrieval.");
+            }
+            var completeRecipeDTO = await repository.GetCompleteRecipe(id);
+            if (completeRecipeDTO == null)
+            {
+                return NotFound($"Recipe with ID {id} not found.");
+            }
+            return Ok(completeRecipeDTO);
         }
 
         /// <summary>
