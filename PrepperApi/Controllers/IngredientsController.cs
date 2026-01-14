@@ -8,7 +8,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class IngredientController(IRepositoryDB<Ingredient> ingrediantRepo) : Controller
+    public class IngredientsController(IRepositoryDB<Ingredient> ingrediantRepo) : Controller
     {
         /// <summary>
         /// Retrieves all ingredients, optionally sorted by the specified property and order.

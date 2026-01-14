@@ -11,13 +11,13 @@ namespace UnitTests.APITests
     public class RecipeInstructionApiTests
     {
         private Mock<IRepositoryDB<RecipeInstruction>> _mockRepo;
-        private RecipeInstructionController _controller;
+        private RecipeInstructionsController _controller;
 
         [TestInitialize]
         public void Setup()
         {
             _mockRepo = new Mock<IRepositoryDB<RecipeInstruction>>();
-            _controller = new RecipeInstructionController(_mockRepo.Object);
+            _controller = new RecipeInstructionsController(_mockRepo.Object);
         }
 
         [TestMethod]

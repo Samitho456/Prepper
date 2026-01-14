@@ -11,13 +11,13 @@ namespace UnitTests.APITests;
 public class NutritionalProfileAPITest
 {
     private Mock<IRepositoryDB<NutritionalProfile>> _mockRepo;
-    private NutritionalProfileController _controller;
+    private NutritionalProfilesController _controller;
 
     [TestInitialize]
     public void Setup()
     {
         _mockRepo = new Mock<IRepositoryDB<NutritionalProfile>>();
-        _controller = new NutritionalProfileController(_mockRepo.Object);
+        _controller = new NutritionalProfilesController(_mockRepo.Object);
     }
 
 

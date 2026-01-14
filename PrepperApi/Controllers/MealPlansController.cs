@@ -7,7 +7,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MealPlanController(IRepositoryDB<MealPlan> mealPlanRepo) : ControllerBase
+    public class MealPlansController(IRepositoryDB<MealPlan> mealPlanRepo) : ControllerBase
     {
         /// <summary>
         /// Retrieves all meal plans, optionally sorted by the specified field and order.

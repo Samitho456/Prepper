@@ -124,6 +124,17 @@ namespace Prepper.Repositories
             return result;
         }
 
+
+        /// <summary>
+        /// Retrieves a complete recipe, including its ingredients and instructions, for the specified recipe
+        /// identifier.
+        /// </summary>
+        /// <remarks>The returned recipe includes all associated ingredients and instructions, ordered by
+        /// step number. If no recipe exists with the specified identifier, the method returns <see
+        /// langword="null"/>.</remarks>
+        /// <param name="id">The unique identifier of the recipe to retrieve.</param>
+        /// <returns>A <see cref="CompleteRecipeDTO"/> containing the recipe details, ingredients, and instructions if found;
+        /// otherwise, <see langword="null"/>.</returns>
         public async Task<CompleteRecipeDTO> GetCompleteRecipe(int id)
         {
             var recipe = await _supabase
@@ -183,6 +194,93 @@ namespace Prepper.Repositories
                     };
                 }).ToList(),
                 Instructions = instructions.Models.Select(ri => new RecipeInstructionDTO
+                {
+                    StepNumber = ri.StepNumber,
+                    InstructionText = ri.InstructionText,
+                    CreatedAt = ri.CreatedAt
+                }).ToList()
+            };
+        }
+
+        public async Task<CompleteRecipeDTO?> AddCompleteRecipe(CompleteRecipeDTO completeRecipeDTO)
+        {
+            if (completeRecipeDTO == null)
+            {
+                return null;
+            }
+            // Add the Recipe
+            var recipe = new Recipe
+            {
+                Title = completeRecipeDTO.Title,
+                Description = completeRecipeDTO.Description,
+                Servings = completeRecipeDTO.Servings,
+                PreparationTimeMinutes = completeRecipeDTO.PreparationTimeMinutes,
+                MealType = completeRecipeDTO.MealType
+            };
+            var addedRecipe = await AddAsync(recipe);
+            var ingredientList = new List<RecipeIngredient>();
+
+
+            // Add the Ingredients
+            foreach (var ingredientDTO in completeRecipeDTO.Ingredients)
+            {
+                if (ingredientDTO.IngredientId == 0)
+                {
+                    // Ingredient does not exist, create it
+                    var newIngredient = new Ingredient
+                    {
+                        Name = ingredientDTO.Name
+                    };
+                    var addedIngredient = await _supabase.From<Ingredient>().Insert(newIngredient);
+                    ingredientDTO.IngredientId = addedIngredient.Models.First().Id;
+                }
+
+                var recipeIngredient = new RecipeIngredient
+                {
+                    RecipeId = addedRecipe.Id,
+                    IngredientId = ingredientDTO.IngredientId,
+                    Quantity = ingredientDTO.Quantity,
+                    Unit = ingredientDTO.Unit
+                };
+                var ingredient = await _supabase.From<RecipeIngredient>().Insert(recipeIngredient);
+                ingredientList.Add(ingredient.Models.First());
+            }
+
+            // Add the Instructions
+            var instructionList = new List<RecipeInstruction>();
+
+            foreach (var instructionDTO in completeRecipeDTO.Instructions)
+            {
+                var recipeInstruction = new RecipeInstruction
+                {
+                    RecipeId = addedRecipe.Id,
+                    StepNumber = instructionDTO.StepNumber,
+                    InstructionText = instructionDTO.InstructionText
+                };
+                var instruction = await _supabase.From<RecipeInstruction>().Insert(recipeInstruction);
+                instructionList.Add(instruction.Models.First());
+            }
+
+            // Return the complete recipe
+            return new CompleteRecipeDTO
+            {
+                Id = addedRecipe.Id,
+                Title = addedRecipe.Title,
+                Description = addedRecipe.Description,
+                Servings = addedRecipe.Servings,
+                PreparationTimeMinutes = addedRecipe.PreparationTimeMinutes,
+                MealType = addedRecipe.MealType,
+                CreatedAt = addedRecipe.CreatedAt,
+                Ingredients = ingredientList.Select(ri => new CompleteRecipeIngredientDTO
+                {
+                    Id = ri.Id,
+                    RecipeId = ri.RecipeId,
+                    IngredientId = ri.IngredientId,
+                    Quantity = ri.Quantity,
+                    Unit = ri.Unit,
+                    CreatedAt = ri.CreatedAt
+                }).ToList(),
+                Instructions = instructionList.Select(ri => new RecipeInstructionDTO
                 {
                     StepNumber = ri.StepNumber,
                     InstructionText = ri.InstructionText,

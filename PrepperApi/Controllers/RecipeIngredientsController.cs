@@ -7,7 +7,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecipeIngredientController(IRepositoryDB<RecipeIngredient> recipeIngredientRepo) : ControllerBase
+    public class RecipeIngredientsController(IRepositoryDB<RecipeIngredient> recipeIngredientRepo) : ControllerBase
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

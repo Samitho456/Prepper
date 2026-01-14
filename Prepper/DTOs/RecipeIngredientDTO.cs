@@ -7,11 +7,11 @@ namespace Prepper.DTOs
         public int Id { get; set; }
         
         [Required(ErrorMessage = "RecipeId is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "RecipeId must be greater than 0")]
+        [Range(0, int.MaxValue, ErrorMessage = "RecipeId must be greater than 0")]
         public int RecipeId { get; set; }
         
         [Required(ErrorMessage = "IngredientId is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "IngredientId must be greater than 0")]
+        [Range(0, int.MaxValue, ErrorMessage = "IngredientId must be greater than 0")]
         public int IngredientId { get; set; }
         
         [Required(ErrorMessage = "Quantity is required")]
