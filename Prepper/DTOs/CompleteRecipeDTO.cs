@@ -16,5 +16,6 @@ namespace Prepper.DTOs
         public DateTimeOffset CreatedAt { get; set; }
         public List<CompleteRecipeIngredientDTO> Ingredients { get; set; }
         public List<RecipeInstructionDTO> Instructions { get; set; }
+        public NutritionalProfileDTO NutritionalProfilePerServing { get; set; }
     }
 }

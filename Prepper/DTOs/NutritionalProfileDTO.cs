@@ -29,5 +29,9 @@
         public float? Protein { get; set; }
 
         public float? Salt { get; set; }
+
+        public bool HasIncompleteData { get; set; }
+
+        public List<string> InaccurateFields { get; set; } = new List<string>();
     }
 }

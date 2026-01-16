@@ -1,4 +1,5 @@
-﻿using Prepper.Models;
+﻿using Prepper.DTOs;
+using Prepper.Models;
 using System.Linq.Expressions;
 using static Supabase.Postgrest.Constants;
 
@@ -36,7 +37,7 @@ namespace Prepper.Repositories
                 .Insert(item);
 
             // Return the inserted ingredient with its assigned ID
-            return result.Models.FirstOrDefault();
+            return result.Models.FirstOrDefault()!;
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace Prepper.Repositories
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all
         /// <see cref="Ingredient"/> objects. The collection will be empty if no ingredients are found.</returns>
-        public async Task<IEnumerable<Ingredient>> GetAllAsync(string sortBy = null, bool ascending = false)
+        public async Task<IEnumerable<Ingredient>> GetAllAsync(string? sortBy = null, bool ascending = false)
         {
             // Base query
             var query = _supabase.From<Ingredient>().Select("*");
@@ -108,6 +109,57 @@ namespace Prepper.Repositories
             return result;
         }
 
+        public async Task<IEnumerable<IngredientWithNutritionalProfilesDTO>> GetAllIngredientsWithNutritionalProfilesAsync()
+        {
+            // Get all ingredients
+            var ingredientsResult = await _supabase
+                .From<Ingredient>()
+                .Select("*")
+                .Get();
+
+            var ingredients = ingredientsResult.Models;
+
+            // For each ingredient, get its nutritional profiles and map to DTO
+            var ingredientDtos = new List<IngredientWithNutritionalProfilesDTO>();
+            foreach (var ingredient in ingredients)
+            {
+                var profilesResult = await _supabase
+                    .From<NutritionalProfile>()
+                    .Where(np => np.IngredientId == ingredient.Id)
+                    .Get();
+
+                var profileDtos = profilesResult.Models
+                    .Select(np => new NutritionalProfileDTO
+                    {
+                        Id = np.Id,
+                        CreatedAt = np.CreatedAt,
+                        IngredientId = np.IngredientId,
+                        UnitAmount = np.UnitAmount,
+                        BaseUnit = np.BaseUnit,
+                        Kcal = np.Kcal,
+                        Kj = np.Kj,
+                        FatTotal = np.FatTotal,
+                        FatSaturated = np.FatSaturated,
+                        CarbohydrateTotal = np.CarbohydrateTotal,
+                        CarbohydrateSugars = np.CarbohydrateSugars,
+                        Fiber = np.Fiber,
+                        Protein = np.Protein,
+                        Salt = np.Salt
+                    })
+                    .ToList();
+
+                ingredientDtos.Add(new IngredientWithNutritionalProfilesDTO
+                {
+                    Id = ingredient.Id,
+                    Name = ingredient.Name,
+                    NutritionalProfiles = profileDtos
+                });
+            }
+
+            // Return all ingredients with their nutritional profiles
+            return ingredientDtos;
+        }
+
         /// <summary>
         /// Asynchronously retrieves all nutritional profiles associated with the specified ingredient ID.
         /// </summary>
@@ -143,7 +195,7 @@ namespace Prepper.Repositories
             }
 
             // Return the updated ingredient
-            return result.Models.FirstOrDefault();
+            return result.Models.FirstOrDefault()!;
         }
     }
 }

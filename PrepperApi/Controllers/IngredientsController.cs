@@ -42,6 +42,21 @@ namespace PrepperApi.Controllers
         }
 
         /// <summary>
+        /// Retrieves a collection of ingredients along with their associated nutritional profiles.
+        /// </summary>
+        /// <returns>An <see cref="IActionResult"/> containing a list of ingredients with their nutritional profiles if the
+        /// operation is successful. Returns a status code 200 (OK) with the data.</returns>
+        [HttpGet("GetNutritionalProfiles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetNutritionalProfiles()
+        {
+            var repo = (IngredientDBRepo)ingrediantRepo;
+            var ingredientsWithNutritionalProfiles = await repo.GetAllIngredientsWithNutritionalProfilesAsync();
+            return Ok(ingredientsWithNutritionalProfiles);
+        }
+
+
+        /// <summary>
         /// Retrieves the nutritional profile information for the specified ingredient.
         /// </summary>
         /// <param name="id">The unique identifier of the ingredient for which to retrieve the nutritional profile. Must be a non-zero
