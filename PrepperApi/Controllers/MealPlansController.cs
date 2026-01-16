@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
+using Prepper.Repositories;
 
 namespace PrepperApi.Controllers
 {
@@ -41,6 +42,17 @@ namespace PrepperApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("week")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetMealPlansForWeek([FromQuery] DateOnly weekStart)
+        {
+            var repo = (MealPlanDBRepo)mealPlanRepo;
+            var mealPlansWithRecipes = await repo.GetMealPlansForWeekWithRecipes(weekStart);
+            
+            return Ok(mealPlansWithRecipes);
         }
 
         /// <summary>
