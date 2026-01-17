@@ -1,3 +1,4 @@
+using Prepper.DTOs;
 using Prepper.Models;
 using System.Linq.Expressions;
 using static Supabase.Postgrest.Constants;
@@ -102,6 +103,292 @@ namespace Prepper.Repositories
 
             return result.Models;
         }
+
+        private async Task<NutritionalProfileDTO> GetNutritionalProfilePerServingAsync(int recipeId)
+        {
+            // Retrieve all ingredients for the specified recipe
+            var recipeIngredients = await _supabase
+                .From<RecipeIngredient>()
+                .Where(ri => ri.RecipeId == recipeId)
+                .Get();
+
+            // If no ingredients found, return null
+            if (!recipeIngredients.Models.Any())
+            {
+                return null;
+            }
+
+            // Initialize aggregated nutritional values
+            float? totalKcal = 0;
+            float? totalKj = 0;
+            float? totalFatTotal = 0;
+            float? totalFatSaturated = 0;
+            float? totalCarbohydrateTotal = 0;
+            float? totalCarbohydrateSugars = 0;
+            float? totalFiber = 0;
+            float? totalProtein = 0;
+            float? totalSalt = 0;
+
+            // Track which fields have missing data
+            bool hasIncompleteKcal = false;
+            bool hasIncompleteKj = false;
+            bool hasIncompleteFatTotal = false;
+            bool hasIncompleteFatSaturated = false;
+            bool hasIncompleteCarbohydrateTotal = false;
+            bool hasIncompleteCarbohydrateSugars = false;
+            bool hasIncompleteFiber = false;
+            bool hasIncompleteProtein = false;
+            bool hasIncompleteSalt = false;
+
+            foreach (var recipeIngredient in recipeIngredients.Models)
+            {
+                var nutritionalProfiles = await _supabase
+                    .From<NutritionalProfile>()
+                    .Where(np => np.IngredientId == recipeIngredient.IngredientId && np.BaseUnit == recipeIngredient.Unit)
+                    .Get();
+
+                if (nutritionalProfiles.Models == null || !nutritionalProfiles.Models.Any())
+                {
+                    System.Diagnostics.Debug.WriteLine($"Warning: No nutritional profile found for ingredient {recipeIngredient.IngredientId} with unit {recipeIngredient.Unit}");
+                    // Mark all fields as incomplete when no profile is found
+                    hasIncompleteKcal = true;
+                    hasIncompleteKj = true;
+                    hasIncompleteFatTotal = true;
+                    hasIncompleteFatSaturated = true;
+                    hasIncompleteCarbohydrateTotal = true;
+                    hasIncompleteCarbohydrateSugars = true;
+                    hasIncompleteFiber = true;
+                    hasIncompleteProtein = true;
+                    hasIncompleteSalt = true;
+                    continue;
+                }
+
+                var nutritionalProfile = nutritionalProfiles.Models.FirstOrDefault();
+
+                if (nutritionalProfile == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Warning: Nutritional profile is null for ingredient {recipeIngredient.IngredientId}");
+                    // Mark all fields as incomplete when profile is null
+                    hasIncompleteKcal = true;
+                    hasIncompleteKj = true;
+                    hasIncompleteFatTotal = true;
+                    hasIncompleteFatSaturated = true;
+                    hasIncompleteCarbohydrateTotal = true;
+                    hasIncompleteCarbohydrateSugars = true;
+                    hasIncompleteFiber = true;
+                    hasIncompleteProtein = true;
+                    hasIncompleteSalt = true;
+                    continue;
+                }
+
+                // Calculate nutritional values based on the quantity used
+                var scaleFactor = recipeIngredient.Quantity / nutritionalProfile.UnitAmount;
+
+                // Aggregate nutritional values and track missing data
+                if (nutritionalProfile.Kcal.HasValue)
+                {
+                    totalKcal += (float?)(nutritionalProfile.Kcal * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteKcal = true;
+                }
+
+                if (nutritionalProfile.Kj.HasValue)
+                {
+                    totalKj += (float?)(nutritionalProfile.Kj * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteKj = true;
+                }
+
+                if (nutritionalProfile.FatTotal.HasValue)
+                {
+                    totalFatTotal += (float?)(nutritionalProfile.FatTotal * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteFatTotal = true;
+                }
+
+                if (nutritionalProfile.FatSaturated.HasValue)
+                {
+                    totalFatSaturated += (float?)(nutritionalProfile.FatSaturated * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteFatSaturated = true;
+                }
+
+                if (nutritionalProfile.CarbohydrateTotal.HasValue)
+                {
+                    totalCarbohydrateTotal += (float?)(nutritionalProfile.CarbohydrateTotal * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteCarbohydrateTotal = true;
+                }
+
+                if (nutritionalProfile.CarbohydrateSugars.HasValue)
+                {
+                    totalCarbohydrateSugars += (float?)(nutritionalProfile.CarbohydrateSugars * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteCarbohydrateSugars = true;
+                }
+
+                if (nutritionalProfile.Fiber.HasValue)
+                {
+                    totalFiber += (float?)(nutritionalProfile.Fiber * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteFiber = true;
+                }
+
+                if (nutritionalProfile.Protein.HasValue)
+                {
+                    totalProtein += (float?)(nutritionalProfile.Protein * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteProtein = true;
+                }
+
+                if (nutritionalProfile.Salt.HasValue)
+                {
+                    totalSalt += (float?)(nutritionalProfile.Salt * scaleFactor);
+                }
+                else
+                {
+                    hasIncompleteSalt = true;
+                }
+            }
+
+            // Build list of inaccurate fields
+            var inaccurateFields = new List<string>();
+            if (hasIncompleteKcal) inaccurateFields.Add("Kcal");
+            if (hasIncompleteKj) inaccurateFields.Add("Kj");
+            if (hasIncompleteFatTotal) inaccurateFields.Add("FatTotal");
+            if (hasIncompleteFatSaturated) inaccurateFields.Add("FatSaturated");
+            if (hasIncompleteCarbohydrateTotal) inaccurateFields.Add("CarbohydrateTotal");
+            if (hasIncompleteCarbohydrateSugars) inaccurateFields.Add("CarbohydrateSugars");
+            if (hasIncompleteFiber) inaccurateFields.Add("Fiber");
+            if (hasIncompleteProtein) inaccurateFields.Add("Protein");
+            if (hasIncompleteSalt) inaccurateFields.Add("Salt");
+
+            // Return aggregated nutritional profile for the recipe
+            return new NutritionalProfileDTO
+            {
+                Kcal = totalKcal == 0 ? null : totalKcal,
+                Kj = totalKj == 0 ? null : totalKj,
+                FatTotal = totalFatTotal == 0 ? null : totalFatTotal,
+                FatSaturated = totalFatSaturated == 0 ? null : totalFatSaturated,
+                CarbohydrateTotal = totalCarbohydrateTotal == 0 ? null : totalCarbohydrateTotal,
+                CarbohydrateSugars = totalCarbohydrateSugars == 0 ? null : totalCarbohydrateSugars,
+                Fiber = totalFiber == 0 ? null : totalFiber,
+                Protein = totalProtein == 0 ? null : totalProtein,
+                Salt = totalSalt == 0 ? null : totalSalt,
+                HasIncompleteData = inaccurateFields.Count > 0,
+                InaccurateFields = inaccurateFields
+            };
+        }
+
+
+        private async Task<CompleteRecipeDTO> GetCompleteRecipe(int id)
+        {
+            var recipe = await _supabase
+                .From<Recipe>()
+                .Where(r => r.Id == id)
+                .Single();
+
+            if (recipe == null)
+            {
+                return null;
+            }
+
+            var recipeIngredients = await _supabase
+                .From<RecipeIngredient>()
+                .Where(i => i.RecipeId == id)
+                .Get();
+
+            var ingredientIds = recipeIngredients.Models
+                .Select(ri => ri.IngredientId)
+                .ToList();
+
+            var allIngredients = await _supabase
+                .From<Ingredient>()
+                .Get();
+
+            var ingredients = allIngredients.Models
+                .Where(i => ingredientIds.Contains(i.Id))
+                .ToList();
+
+            var instructions = await _supabase
+                .From<RecipeInstruction>()
+                .Where(ri => ri.RecipeId == id)
+                .Order(ri => ri.StepNumber, Ordering.Ascending)
+                .Get();
+
+            return new CompleteRecipeDTO
+            {
+                Id = recipe.Id,
+                Title = recipe.Title,
+                Description = recipe.Description,
+                Servings = recipe.Servings,
+                PreparationTimeMinutes = recipe.PreparationTimeMinutes,
+                MealType = recipe.MealType,
+                CreatedAt = recipe.CreatedAt,
+                Ingredients = recipeIngredients.Models.Select(ri =>
+                {
+                    var ingredient = ingredients.FirstOrDefault(i => i.Id == ri.IngredientId);
+                    return new CompleteRecipeIngredientDTO
+                    {
+                        Id = ingredient.Id,
+                        Name = ingredient.Name,
+                        RecipeId = ri.RecipeId,
+                        IngredientId = ri.IngredientId,
+                        Quantity = ri.Quantity,
+                        Unit = ri.Unit,
+                        CreatedAt = ri.CreatedAt
+                    };
+                }).ToList(),
+                Instructions = instructions.Models.Select(ri => new RecipeInstructionDTO
+                {
+                    StepNumber = ri.StepNumber,
+                    InstructionText = ri.InstructionText,
+                    CreatedAt = ri.CreatedAt
+                }).ToList(),
+                NutritionalProfilePerServing = await GetNutritionalProfilePerServingAsync(recipe.Id)
+            };
+        }
+
+
+        public async Task<IEnumerable<MealPlanWithRecipeDTO>> GetMealPlansForWeekWithRecipes(DateOnly weekStart)
+        {
+            DateOnly weekEnd = weekStart.AddDays(7);
+            var result = await _supabase
+                .From<MealPlan>()
+                .Where(mp => mp.Date >= weekStart && mp.Date < weekEnd)
+                .Order(mp => mp.Date, Ordering.Ascending)
+                .Get();
+
+            var mealPlansWithRecipes = result.Models.Select(mp => new MealPlanWithRecipeDTO
+            {
+                Id = mp.Id,
+                CreatedAt = mp.CreatedAt,
+                IsConsumed = mp.IsConsumed,
+                UserId = mp.UserId,
+                RecipeId = mp.RecipeId,
+                MealType = mp.MealType,
+                Date = mp.Date,
+                Recipe = GetCompleteRecipe(mp.RecipeId).Result
+            });
+            return mealPlansWithRecipes;
+        }
+
 
         /// <summary>
         /// Asynchronously retrieves a meal plan by its unique identifier.

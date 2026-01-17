@@ -51,7 +51,7 @@ namespace PrepperApi.Controllers
         {
             var repo = (MealPlanDBRepo)mealPlanRepo;
             var mealPlansWithRecipes = await repo.GetMealPlansForWeekWithRecipes(weekStart);
-            
+
             return Ok(mealPlansWithRecipes);
         }
 
