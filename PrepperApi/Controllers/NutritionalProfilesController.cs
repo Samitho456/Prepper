@@ -8,7 +8,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class NutritionalProfileController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo) : Controller
+    public class NutritionalProfilesController(IRepositoryDB<NutritionalProfile> nutritionalProfileRepo) : Controller
     {
         /// <summary>
         /// Retrieves all nutritional profiles, optionally sorted by the specified field and order.

@@ -7,10 +7,10 @@ namespace Prepper.DTOs
         public int Id { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
 
-        [Range(1, int.MaxValue)]
+        [Range(0, int.MaxValue)]
         public int RecipeId { get; set; }
 
-        [Range(1, int.MaxValue)]
+        [Range(0, int.MaxValue)]
         public int StepNumber { get; set; }
 
         [Required]

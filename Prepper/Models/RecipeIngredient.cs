@@ -4,7 +4,7 @@ using Supabase.Postgrest.Models;
 namespace Prepper.Models
 {
     [Table("recipe_ingredients")]
-    public class RecipeIngredients : BaseModel
+    public class RecipeIngredient : BaseModel
     {
         // Unique identifier for the recipe ingredient entry
         [PrimaryKey("id", false)]
@@ -20,7 +20,7 @@ namespace Prepper.Models
 
         // Quantity of the ingredient needed for the recipe
         [Column("quantity")]
-        public string Quantity { get; set; }
+        public double Quantity { get; set; }
 
         // Unit of measurement for the ingredient quantity (e.g., grams, cups)
         [Column("unit")]
@@ -31,7 +31,7 @@ namespace Prepper.Models
         public DateTimeOffset CreatedAt { get; set; }
 
         // Parameterized constructor
-        public RecipeIngredients(int id, int recipeId, int ingredientId, string quantity, string unit, DateTimeOffset createdAt)
+        public RecipeIngredient(int id, int recipeId, int ingredientId, double quantity, string unit, DateTimeOffset createdAt)
         {
             Id = id;
             RecipeId = recipeId;
@@ -42,7 +42,7 @@ namespace Prepper.Models
         }
 
         // Default constructor
-        public RecipeIngredients() { }
+        public RecipeIngredient() { }
 
         // Override ToString for better readability
         public override string ToString()

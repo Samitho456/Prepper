@@ -12,12 +12,12 @@ namespace UnitTests.ModelTests
             var id = 1;
             var recipeId = 10;
             var ingredientId = 5;
-            var quantity = "2.5";
+            var quantity = 2.5;
             var unit = "cups";
             var createdAt = DateTimeOffset.Now;
 
             // Act
-            var recipeIngredient = new RecipeIngredients(id, recipeId, ingredientId, quantity, unit, createdAt);
+            var recipeIngredient = new RecipeIngredient(id, recipeId, ingredientId, quantity, unit, createdAt);
 
             // Assert
             Assert.AreEqual(id, recipeIngredient.Id);
@@ -32,14 +32,14 @@ namespace UnitTests.ModelTests
         public void CreateValidRecipeIngredients_WithDefaultConstructor()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients();
+            var recipeIngredient = new RecipeIngredient();
 
             // Assert
             Assert.IsNotNull(recipeIngredient);
             Assert.AreEqual(0, recipeIngredient.Id);
             Assert.AreEqual(0, recipeIngredient.RecipeId);
             Assert.AreEqual(0, recipeIngredient.IngredientId);
-            Assert.IsNull(recipeIngredient.Quantity);
+            Assert.AreEqual(0.0, recipeIngredient.Quantity);
             Assert.IsNull(recipeIngredient.Unit);
         }
 
@@ -47,14 +47,14 @@ namespace UnitTests.ModelTests
         public void RecipeIngredients_SetProperties_Success()
         {
             // Arrange
-            var recipeIngredient = new RecipeIngredients();
+            var recipeIngredient = new RecipeIngredient();
             var createdAt = DateTimeOffset.Now;
 
             // Act
             recipeIngredient.Id = 3;
             recipeIngredient.RecipeId = 15;
             recipeIngredient.IngredientId = 8;
-            recipeIngredient.Quantity = "1";
+            recipeIngredient.Quantity = 1.0;
             recipeIngredient.Unit = "tablespoon";
             recipeIngredient.CreatedAt = createdAt;
 
@@ -62,7 +62,7 @@ namespace UnitTests.ModelTests
             Assert.AreEqual(3, recipeIngredient.Id);
             Assert.AreEqual(15, recipeIngredient.RecipeId);
             Assert.AreEqual(8, recipeIngredient.IngredientId);
-            Assert.AreEqual("1", recipeIngredient.Quantity);
+            Assert.AreEqual(1.0, recipeIngredient.Quantity);
             Assert.AreEqual("tablespoon", recipeIngredient.Unit);
             Assert.AreEqual(createdAt, recipeIngredient.CreatedAt);
         }
@@ -72,7 +72,7 @@ namespace UnitTests.ModelTests
         {
             // Arrange
             var createdAt = new DateTimeOffset(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
-            var recipeIngredient = new RecipeIngredients(1, 5, 10, "3", "grams", createdAt);
+            var recipeIngredient = new RecipeIngredient(1, 5, 10, 3.0, "grams", createdAt);
 
             // Act
             var result = recipeIngredient.ToString();
@@ -85,73 +85,73 @@ namespace UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void RecipeIngredients_WithNullQuantity()
+        public void RecipeIngredients_WithZeroQuantity()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients(1, 1, 1, null, "cups", DateTimeOffset.Now);
+            var recipeIngredient = new RecipeIngredient(1, 1, 1, 0.0, "cups", DateTimeOffset.Now);
 
             // Assert
-            Assert.IsNull(recipeIngredient.Quantity);
+            Assert.AreEqual(0.0, recipeIngredient.Quantity);
         }
 
         [TestMethod]
         public void RecipeIngredients_WithNullUnit()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients(1, 1, 1, "100", null, DateTimeOffset.Now);
+            var recipeIngredient = new RecipeIngredient(1, 1, 1, 100.0, null, DateTimeOffset.Now);
 
             // Assert
             Assert.IsNull(recipeIngredient.Unit);
         }
 
         [TestMethod]
-        public void RecipeIngredients_WithEmptyQuantity()
+        public void RecipeIngredients_WithSmallQuantity()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients(1, 1, 1, string.Empty, "ml", DateTimeOffset.Now);
+            var recipeIngredient = new RecipeIngredient(1, 1, 1, 0.5, "ml", DateTimeOffset.Now);
 
             // Assert
-            Assert.AreEqual(string.Empty, recipeIngredient.Quantity);
+            Assert.AreEqual(0.5, recipeIngredient.Quantity);
         }
 
         [TestMethod]
         public void RecipeIngredients_WithEmptyUnit()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients(1, 1, 1, "50", string.Empty, DateTimeOffset.Now);
+            var recipeIngredient = new RecipeIngredient(1, 1, 1, 50.0, string.Empty, DateTimeOffset.Now);
 
             // Assert
             Assert.AreEqual(string.Empty, recipeIngredient.Unit);
         }
 
         [TestMethod]
-        public void RecipeIngredients_WithDecimalQuantity()
+        public void RecipeIngredients_WithLargeQuantity()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients(1, 1, 1, "0.5", "kg", DateTimeOffset.Now);
+            var recipeIngredient = new RecipeIngredient(1, 1, 1, 1000.0, "kg", DateTimeOffset.Now);
 
             // Assert
-            Assert.AreEqual("0.5", recipeIngredient.Quantity);
+            Assert.AreEqual(1000.0, recipeIngredient.Quantity);
         }
 
         [TestMethod]
-        public void RecipeIngredients_WithFractionalQuantity()
+        public void RecipeIngredients_WithMediumQuantity()
         {
             // Act
-            var recipeIngredient = new RecipeIngredients(1, 1, 1, "1/2", "cup", DateTimeOffset.Now);
+            var recipeIngredient = new RecipeIngredient(1, 1, 1, 50.5, "cup", DateTimeOffset.Now);
 
             // Assert
-            Assert.AreEqual("1/2", recipeIngredient.Quantity);
+            Assert.AreEqual(50.5, recipeIngredient.Quantity);
         }
 
         [TestMethod]
         public void RecipeIngredients_WithVariousUnits()
         {
             // Arrange & Act
-            var ingredient1 = new RecipeIngredients(1, 1, 1, "100", "grams", DateTimeOffset.Now);
-            var ingredient2 = new RecipeIngredients(2, 1, 2, "2", "cups", DateTimeOffset.Now);
-            var ingredient3 = new RecipeIngredients(3, 1, 3, "1", "teaspoon", DateTimeOffset.Now);
-            var ingredient4 = new RecipeIngredients(4, 1, 4, "250", "ml", DateTimeOffset.Now);
+            var ingredient1 = new RecipeIngredient(1, 1, 1, 100.0, "grams", DateTimeOffset.Now);
+            var ingredient2 = new RecipeIngredient(2, 1, 2, 2.5, "cups", DateTimeOffset.Now);
+            var ingredient3 = new RecipeIngredient(3, 1, 3, 1.0, "teaspoon", DateTimeOffset.Now);
+            var ingredient4 = new RecipeIngredient(4, 1, 4, 250.0, "ml", DateTimeOffset.Now);
 
             // Assert
             Assert.AreEqual("grams", ingredient1.Unit);

@@ -7,7 +7,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecipeIngredientController(IRepositoryDB<RecipeIngredients> recipeIngredientRepo) : ControllerBase
+    public class RecipeIngredientsController(IRepositoryDB<RecipeIngredient> recipeIngredientRepo) : ControllerBase
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -72,7 +72,7 @@ namespace PrepperApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var recipeIngredient = new RecipeIngredients
+            var recipeIngredient = new RecipeIngredient
             {
                 RecipeId = recipeIngredientDTO.RecipeId,
                 IngredientId = recipeIngredientDTO.IngredientId,
@@ -111,7 +111,7 @@ namespace PrepperApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var recipeIngredient = new RecipeIngredients
+            var recipeIngredient = new RecipeIngredient
             {
                 RecipeId = recipeIngredientDTO.RecipeId,
                 IngredientId = recipeIngredientDTO.IngredientId,

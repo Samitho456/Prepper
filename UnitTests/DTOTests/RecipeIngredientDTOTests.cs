@@ -16,7 +16,7 @@ namespace UnitTests.DTOTests
             Assert.AreEqual(0, dto.Id);
             Assert.AreEqual(0, dto.RecipeId);
             Assert.AreEqual(0, dto.IngredientId);
-            Assert.IsNull(dto.Quantity);
+            Assert.AreEqual(0.0, dto.Quantity);
             Assert.IsNull(dto.Unit);
         }
 
@@ -31,7 +31,7 @@ namespace UnitTests.DTOTests
             dto.Id = 1;
             dto.RecipeId = 10;
             dto.IngredientId = 5;
-            dto.Quantity = "2.5";
+            dto.Quantity = 2.5;
             dto.Unit = "cups";
             dto.CreatedAt = createdAt;
 
@@ -39,7 +39,7 @@ namespace UnitTests.DTOTests
             Assert.AreEqual(1, dto.Id);
             Assert.AreEqual(10, dto.RecipeId);
             Assert.AreEqual(5, dto.IngredientId);
-            Assert.AreEqual("2.5", dto.Quantity);
+            Assert.AreEqual(2.5, dto.Quantity);
             Assert.AreEqual("cups", dto.Unit);
             Assert.AreEqual(createdAt, dto.CreatedAt);
         }
@@ -56,7 +56,7 @@ namespace UnitTests.DTOTests
                 Id = 3,
                 RecipeId = 15,
                 IngredientId = 8,
-                Quantity = "1",
+                Quantity = 1.0,
                 Unit = "tablespoon",
                 CreatedAt = createdAt
             };
@@ -65,29 +65,29 @@ namespace UnitTests.DTOTests
             Assert.AreEqual(3, dto.Id);
             Assert.AreEqual(15, dto.RecipeId);
             Assert.AreEqual(8, dto.IngredientId);
-            Assert.AreEqual("1", dto.Quantity);
+            Assert.AreEqual(1.0, dto.Quantity);
             Assert.AreEqual("tablespoon", dto.Unit);
             Assert.AreEqual(createdAt, dto.CreatedAt);
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithNullQuantity()
+        public void RecipeIngredientDTO_WithZeroQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = null };
+            var dto = new RecipeIngredientDTO { Quantity = 0.0 };
 
             // Assert
-            Assert.IsNull(dto.Quantity);
+            Assert.AreEqual(0.0, dto.Quantity);
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithEmptyQuantity()
+        public void RecipeIngredientDTO_WithSmallQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = string.Empty };
+            var dto = new RecipeIngredientDTO { Quantity = 0.5 };
 
             // Assert
-            Assert.AreEqual(string.Empty, dto.Quantity);
+            Assert.AreEqual(0.5, dto.Quantity);
         }
 
         [TestMethod]
@@ -111,33 +111,33 @@ namespace UnitTests.DTOTests
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithDecimalQuantity()
+        public void RecipeIngredientDTO_WithMediumQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "0.5" };
+            var dto = new RecipeIngredientDTO { Quantity = 50.5 };
 
             // Assert
-            Assert.AreEqual("0.5", dto.Quantity);
+            Assert.AreEqual(50.5, dto.Quantity);
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithFractionalQuantity()
+        public void RecipeIngredientDTO_WithLargerQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "1/2" };
+            var dto = new RecipeIngredientDTO { Quantity = 100.75 };
 
             // Assert
-            Assert.AreEqual("1/2", dto.Quantity);
+            Assert.AreEqual(100.75, dto.Quantity);
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithMixedNumberQuantity()
+        public void RecipeIngredientDTO_WithMultipleQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "2 1/2" };
+            var dto = new RecipeIngredientDTO { Quantity = 250.25 };
 
             // Assert
-            Assert.AreEqual("2 1/2", dto.Quantity);
+            Assert.AreEqual(250.25, dto.Quantity);
         }
 
         [TestMethod]
@@ -170,53 +170,53 @@ namespace UnitTests.DTOTests
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithZeroQuantity()
+        public void RecipeIngredientDTO_WithZeroValue()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "0" };
+            var dto = new RecipeIngredientDTO { Quantity = 0.0 };
 
             // Assert
-            Assert.AreEqual("0", dto.Quantity);
+            Assert.AreEqual(0.0, dto.Quantity);
         }
 
         [TestMethod]
         public void RecipeIngredientDTO_WithNegativeQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "-5" };
+            var dto = new RecipeIngredientDTO { Quantity = -5.5 };
 
             // Assert
-            Assert.AreEqual("-5", dto.Quantity);
+            Assert.AreEqual(-5.5, dto.Quantity);
         }
 
         [TestMethod]
         public void RecipeIngredientDTO_WithLargeQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "1000" };
+            var dto = new RecipeIngredientDTO { Quantity = 1000.0 };
 
             // Assert
-            Assert.AreEqual("1000", dto.Quantity);
+            Assert.AreEqual(1000.0, dto.Quantity);
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithRangeQuantity()
+        public void RecipeIngredientDTO_WithSmallRangeQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "2-3" };
+            var dto = new RecipeIngredientDTO { Quantity = 2.5 };
 
             // Assert
-            Assert.AreEqual("2-3", dto.Quantity);
+            Assert.AreEqual(2.5, dto.Quantity);
         }
 
         [TestMethod]
-        public void RecipeIngredientDTO_WithToTasteQuantity()
+        public void RecipeIngredientDTO_WithTypicalQuantity()
         {
             // Act
-            var dto = new RecipeIngredientDTO { Quantity = "to taste" };
+            var dto = new RecipeIngredientDTO { Quantity = 5.0 };
 
             // Assert
-            Assert.AreEqual("to taste", dto.Quantity);
+            Assert.AreEqual(5.0, dto.Quantity);
         }
 
         [TestMethod]
@@ -233,9 +233,9 @@ namespace UnitTests.DTOTests
         public void RecipeIngredientDTO_MultipleIngredientsForSameRecipe()
         {
             // Act
-            var ingredient1 = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 10, Quantity = "2", Unit = "cups" };
-            var ingredient2 = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 11, Quantity = "1", Unit = "teaspoon" };
-            var ingredient3 = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 12, Quantity = "500", Unit = "grams" };
+            var ingredient1 = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 10, Quantity = 2.5, Unit = "cups" };
+            var ingredient2 = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 11, Quantity = 1.0, Unit = "teaspoon" };
+            var ingredient3 = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 12, Quantity = 500.0, Unit = "grams" };
 
             // Assert
             Assert.AreEqual(1, ingredient1.RecipeId);

@@ -10,24 +10,24 @@ namespace UnitTests.APITests
     [TestClass]
     public class RecipeIngredientAPITests
     {
-        private Mock<IRepositoryDB<RecipeIngredients>> _mockRepo;
-        private RecipeIngredientController _controller;
+        private Mock<IRepositoryDB<RecipeIngredient>> _mockRepo;
+        private RecipeIngredientsController _controller;
 
         [TestInitialize]
         public void Setup()
         {
-            _mockRepo = new Mock<IRepositoryDB<RecipeIngredients>>();
-            _controller = new RecipeIngredientController(_mockRepo.Object);
+            _mockRepo = new Mock<IRepositoryDB<RecipeIngredient>>();
+            _controller = new RecipeIngredientsController(_mockRepo.Object);
         }
 
         [TestMethod]
         public async Task GetAll_ReturnsOkResult_WithListOfRecipeIngredients()
         {
             // Arrange
-            var recipeIngredients = new List<RecipeIngredients>
+            var recipeIngredients = new List<RecipeIngredient>
             {
-                new RecipeIngredients { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1", Unit = "cup" },
-                new RecipeIngredients { Id = 2, RecipeId = 1, IngredientId = 2, Quantity = "2", Unit = "tbsp" }
+                new RecipeIngredient { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.0, Unit = "cup" },
+                new RecipeIngredient { Id = 2, RecipeId = 1, IngredientId = 2, Quantity = 2.0, Unit = "tbsp" }
             };
             _mockRepo.Setup(repo => repo.GetAllAsync(It.IsAny<string>(), It.IsAny<bool>())).ReturnsAsync(recipeIngredients);
 
@@ -59,7 +59,7 @@ namespace UnitTests.APITests
         public async Task Get_ReturnsNotFound_WhenRecipeIngredientDoesNotExist()
         {
             // Arrange
-            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((RecipeIngredients)null);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((RecipeIngredient)null);
 
             // Act
             var result = await _controller.Get(1);
@@ -72,7 +72,7 @@ namespace UnitTests.APITests
         public async Task Get_ReturnsOkResult_WithRecipeIngredient()
         {
             // Arrange
-            var recipeIngredient = new RecipeIngredients { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1", Unit = "cup" };
+            var recipeIngredient = new RecipeIngredient { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.0, Unit = "cup" };
             _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(recipeIngredient);
 
             // Act
@@ -90,9 +90,9 @@ namespace UnitTests.APITests
         public async Task Create_ReturnsCreatedAtActionResult_WithNewRecipeIngredient()
         {
             // Arrange
-            var recipeIngredientDTO = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 1, Quantity = "1", Unit = "cup" };
-            var recipeIngredient = new RecipeIngredients { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1", Unit = "cup" };
-            _mockRepo.Setup(repo => repo.AddAsync(It.IsAny<RecipeIngredients>())).ReturnsAsync(recipeIngredient);
+            var recipeIngredientDTO = new RecipeIngredientDTO { RecipeId = 1, IngredientId = 1, Quantity = 1.0, Unit = "cup" };
+            var recipeIngredient = new RecipeIngredient { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.0, Unit = "cup" };
+            _mockRepo.Setup(repo => repo.AddAsync(It.IsAny<RecipeIngredient>())).ReturnsAsync(recipeIngredient);
 
             // Act
             var result = await _controller.Create(recipeIngredientDTO);
@@ -118,8 +118,8 @@ namespace UnitTests.APITests
         public async Task Update_ReturnsNotFound_WhenRecipeIngredientDoesNotExist()
         {
             // Arrange
-            var recipeIngredientDTO = new RecipeIngredientDTO { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1.5", Unit = "cups" };
-            _mockRepo.Setup(repo => repo.UpdateAsync(1, It.IsAny<RecipeIngredients>())).ReturnsAsync((RecipeIngredients)null);
+            var recipeIngredientDTO = new RecipeIngredientDTO { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.5, Unit = "cups" };
+            _mockRepo.Setup(repo => repo.UpdateAsync(1, It.IsAny<RecipeIngredient>())).ReturnsAsync((RecipeIngredient)null);
 
             // Act
             var result = await _controller.Update(1, recipeIngredientDTO);
@@ -132,9 +132,9 @@ namespace UnitTests.APITests
         public async Task Update_ReturnsOkResult_WithUpdatedRecipeIngredient()
         {
             // Arrange
-            var recipeIngredientDTO = new RecipeIngredientDTO { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1.5", Unit = "cups" };
-            var recipeIngredient = new RecipeIngredients { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1.5", Unit = "cups" };
-            _mockRepo.Setup(repo => repo.UpdateAsync(1, It.IsAny<RecipeIngredients>())).ReturnsAsync(recipeIngredient);
+            var recipeIngredientDTO = new RecipeIngredientDTO { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.5, Unit = "cups" };
+            var recipeIngredient = new RecipeIngredient { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.5, Unit = "cups" };
+            _mockRepo.Setup(repo => repo.UpdateAsync(1, It.IsAny<RecipeIngredient>())).ReturnsAsync(recipeIngredient);
 
             // Act
             var result = await _controller.Update(1, recipeIngredientDTO);
@@ -144,14 +144,14 @@ namespace UnitTests.APITests
             Assert.IsNotNull(okResult);
             var returnValue = okResult.Value as RecipeIngredientDTO;
             Assert.IsNotNull(returnValue);
-            Assert.AreEqual("1.5", returnValue.Quantity);
+            Assert.AreEqual(1.5, returnValue.Quantity);
         }
 
         [TestMethod]
         public async Task Delete_ReturnsNotFound_WhenRecipeIngredientDoesNotExist()
         {
             // Arrange
-            _mockRepo.Setup(repo => repo.DeleteAsync(1)).ReturnsAsync((RecipeIngredients)null);
+            _mockRepo.Setup(repo => repo.DeleteAsync(1)).ReturnsAsync((RecipeIngredient)null);
 
             // Act
             var result = await _controller.Delete(1);
@@ -164,7 +164,7 @@ namespace UnitTests.APITests
         public async Task Delete_ReturnsOkResult_WithDeletedRecipeIngredient()
         {
             // Arrange
-            var recipeIngredient = new RecipeIngredients { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = "1", Unit = "cup" };
+            var recipeIngredient = new RecipeIngredient { Id = 1, RecipeId = 1, IngredientId = 1, Quantity = 1.0, Unit = "cup" };
             _mockRepo.Setup(repo => repo.DeleteAsync(1)).ReturnsAsync(recipeIngredient);
 
             // Act

@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
+using Prepper.Repositories;
 
 namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MealPlanController(IRepositoryDB<MealPlan> mealPlanRepo) : ControllerBase
+    public class MealPlansController(IRepositoryDB<MealPlan> mealPlanRepo) : ControllerBase
     {
         /// <summary>
         /// Retrieves all meal plans, optionally sorted by the specified field and order.
@@ -41,6 +42,17 @@ namespace PrepperApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("week")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetMealPlansForWeek([FromQuery] DateOnly weekStart)
+        {
+            var repo = (MealPlanDBRepo)mealPlanRepo;
+            var mealPlansWithRecipes = await repo.GetMealPlansForWeekWithRecipes(weekStart);
+
+            return Ok(mealPlansWithRecipes);
         }
 
         /// <summary>
@@ -93,6 +105,20 @@ namespace PrepperApi.Controllers
                 return BadRequest("Meal plan data is required.");
             }
 
+            if (mealPlanDTO.UserId <= 0)
+            {
+                return BadRequest("User ID must be greater than zero.");
+            }
+            if (mealPlanDTO.RecipeId <= 0)
+            {
+                return BadRequest("Recipe ID must be greater than zero.");
+            }
+            if(string.IsNullOrWhiteSpace(mealPlanDTO.MealType))
+            {
+                return BadRequest("Meal type is required.");
+            }
+
+
             var mealPlan = new MealPlan
             {
                 IsConsumed = mealPlanDTO.IsConsumed,
@@ -103,6 +129,11 @@ namespace PrepperApi.Controllers
             };
 
             var createdMealPlan = await mealPlanRepo.AddAsync(mealPlan);
+
+            if(createdMealPlan == null)
+            {
+                return BadRequest("Failed to create meal plan.");
+            }
 
             var createdMealPlanDTO = new MealPlanDTO
             {
@@ -115,7 +146,7 @@ namespace PrepperApi.Controllers
                 Date = createdMealPlan.Date
             };
 
-            return CreatedAtAction(nameof(Get), new { id = createdMealPlanDTO.Id }, createdMealPlanDTO);
+            return CreatedAtAction(nameof(Get), new { id = createdMealPlanDTO.Id }, createdMealPlanDTO);    
         }
 
         /// <summary>

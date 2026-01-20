@@ -7,7 +7,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecipeInstructionController(IRepositoryDB<RecipeInstruction> recipeInstructionRepo) : ControllerBase
+    public class RecipeInstructionsController(IRepositoryDB<RecipeInstruction> recipeInstructionRepo) : ControllerBase
     {
         /// <summary>
         /// Retrieves all recipe instructions, optionally sorted by the specified field and order.

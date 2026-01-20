@@ -2,12 +2,13 @@
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
+using Prepper.Repositories;
 
 namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecipeController(IRepositoryDB<Recipe> recipeRepo) : ControllerBase
+    public class RecipesController(IRepositoryDB<Recipe> recipeRepo) : ControllerBase
     {
 
         /// <summary>
@@ -72,6 +73,38 @@ namespace PrepperApi.Controllers
                 Description = recipe.Description,
             };
             return Ok(recipeDTO);
+        }
+
+        [HttpGet("/api/Fullrecipes/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetFullRecipe(int id)
+        {
+            var repository = recipeRepo as RecipeDBRepo;
+            if (repository == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Repository does not support full recipe retrieval.");
+            }
+            var completeRecipeDTO = await repository.GetCompleteRecipe(id);
+            if (completeRecipeDTO == null)
+            {
+                return NotFound($"Recipe with ID {id} not found.");
+            }
+            return Ok(completeRecipeDTO);
+        }
+
+        [HttpPost("/api/Fullrecipes")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateFullRecipe([FromBody] CompleteRecipeDTO completeRecipeDTO)
+        {
+            var repository = recipeRepo as RecipeDBRepo;
+            var createdCompleteRecipeDTO = await repository.AddCompleteRecipe(completeRecipeDTO);
+            if (createdCompleteRecipeDTO == null)
+            {
+                return BadRequest("Complete recipe data is required.");
+            }
+            return CreatedAtAction(nameof(GetFullRecipe), new { id = createdCompleteRecipeDTO.Id }, createdCompleteRecipeDTO);
         }
 
         /// <summary>
