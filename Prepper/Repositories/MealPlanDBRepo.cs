@@ -36,13 +36,22 @@ namespace Prepper.Repositories
         /// <param name="item">The meal plan to add. Cannot be null.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the added meal plan, or null if the
         /// operation did not succeed.</returns>
-        public async Task<MealPlan> AddAsync(MealPlan item)
+        public async Task<MealPlan> AddAsync(MealPlan mealplan)
         {
-            var result = await _supabase
-                .From<MealPlan>()
-                .Insert(item);
+            try
+            {
+                var result = await _supabase
+                    .From<MealPlan>()
+                    .Insert(mealplan);
+                return result.Models.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding meal plan: {ex.Message}");
+                return null;
+            }
 
-            return result.Models.FirstOrDefault();
+
         }
 
         /// <summary>

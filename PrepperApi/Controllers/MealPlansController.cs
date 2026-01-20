@@ -105,6 +105,20 @@ namespace PrepperApi.Controllers
                 return BadRequest("Meal plan data is required.");
             }
 
+            if (mealPlanDTO.UserId <= 0)
+            {
+                return BadRequest("User ID must be greater than zero.");
+            }
+            if (mealPlanDTO.RecipeId <= 0)
+            {
+                return BadRequest("Recipe ID must be greater than zero.");
+            }
+            if(string.IsNullOrWhiteSpace(mealPlanDTO.MealType))
+            {
+                return BadRequest("Meal type is required.");
+            }
+
+
             var mealPlan = new MealPlan
             {
                 IsConsumed = mealPlanDTO.IsConsumed,
@@ -115,6 +129,11 @@ namespace PrepperApi.Controllers
             };
 
             var createdMealPlan = await mealPlanRepo.AddAsync(mealPlan);
+
+            if(createdMealPlan == null)
+            {
+                return BadRequest("Failed to create meal plan.");
+            }
 
             var createdMealPlanDTO = new MealPlanDTO
             {
@@ -127,7 +146,7 @@ namespace PrepperApi.Controllers
                 Date = createdMealPlan.Date
             };
 
-            return CreatedAtAction(nameof(Get), new { id = createdMealPlanDTO.Id }, createdMealPlanDTO);
+            return CreatedAtAction(nameof(Get), new { id = createdMealPlanDTO.Id }, createdMealPlanDTO);    
         }
 
         /// <summary>
