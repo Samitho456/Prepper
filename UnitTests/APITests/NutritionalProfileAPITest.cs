@@ -191,7 +191,7 @@ public class NutritionalProfileAPITest
         // Assert
         var okResult = result as OkObjectResult;
         Assert.IsNotNull(okResult);
-        var returnValue = okResult.Value as NutritionalProfile;
+        var returnValue = okResult.Value as NutritionalProfileDTO;
         Assert.IsNotNull(returnValue);
         Assert.AreEqual(updatedProfile.UnitAmount, returnValue.UnitAmount);
     }

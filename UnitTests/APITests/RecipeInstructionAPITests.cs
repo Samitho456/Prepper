@@ -185,7 +185,7 @@ namespace UnitTests.APITests
             // Assert
             var okResult = result as OkObjectResult;
             Assert.IsNotNull(okResult);
-            var returnedInstruction = okResult.Value as RecipeInstruction;
+            var returnedInstruction = okResult.Value as RecipeInstructionDTO;
             Assert.IsNotNull(returnedInstruction);
             Assert.AreEqual(1, returnedInstruction.Id);
         }

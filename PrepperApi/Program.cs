@@ -8,35 +8,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Load environment variables from .env file
 Env.Load();
 
-bool useSupabaseDB = true;
+var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
 
-if (useSupabaseDB)
+// Initialize Supabase client
+var options = new SupabaseOptions
 {
-    var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-    var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+    AutoConnectRealtime = true,
+    AutoRefreshToken = true
+};
 
-    // Initialize Supabase client
-    var options = new SupabaseOptions
-    {
-        AutoConnectRealtime = true,
-        AutoRefreshToken = true
-    };
+// Register the Client as a Singleton
+builder.Services.AddSingleton(provider => new Supabase.Client(url!, key!, options));
 
-    // Register the Client as a Singleton
-    builder.Services.AddSingleton(provider => new Supabase.Client(url!, key!, options));
-
-    // Register the repository
-    builder.Services.AddScoped<IRepositoryDB<Ingredient>, IngredientDBRepo>();
-    builder.Services.AddScoped<IRepositoryDB<NutritionalProfile>, NutritionalProfileDBRepo>();
-    builder.Services.AddScoped<IRepositoryDB<Recipe>, RecipeDBRepo>();
-    builder.Services.AddScoped<IRepositoryDB<RecipeIngredient>, RecipeIngredientDBRepo>();
-    builder.Services.AddScoped<IRepositoryDB<RecipeInstruction>, RecipeInstructionDBRepo>();
-    builder.Services.AddScoped<IRepositoryDB<MealPlan>, MealPlanDBRepo>();
-}
-else
-{
-    builder.Services.AddSingleton<IRepository<Ingredient>, IngrediantRepo>();
-}
+// Register the repository
+builder.Services.AddScoped<IRepositoryDB<Ingredient>, IngredientDBRepo>();
+builder.Services.AddScoped<IRepositoryDB<NutritionalProfile>, NutritionalProfileDBRepo>();
+builder.Services.AddScoped<IRepositoryDB<Recipe>, RecipeDBRepo>();
+builder.Services.AddScoped<IRepositoryDB<RecipeIngredient>, RecipeIngredientDBRepo>();
+builder.Services.AddScoped<IRepositoryDB<RecipeInstruction>, RecipeInstructionDBRepo>();
+builder.Services.AddScoped<IRepositoryDB<MealPlan>, MealPlanDBRepo>();
 
 // Add services to the container.
 builder.Services.AddControllers();

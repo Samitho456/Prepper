@@ -37,7 +37,7 @@ namespace UnitTests.APITests
             // Assert
             var okResult = result as OkObjectResult;
             Assert.IsNotNull(okResult);
-            var returnedRecipes = okResult.Value as IEnumerable<Recipe>;
+            var returnedRecipes = okResult.Value as IEnumerable<RecipeDTO>;
             Assert.IsNotNull(returnedRecipes);
             Assert.AreEqual(2, returnedRecipes.Count());
         }
