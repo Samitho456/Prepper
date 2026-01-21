@@ -18,7 +18,7 @@ namespace Prepper.Repositories
             { "quantity", item => item.Quantity },
             { "unit", item => item.Unit },
             { "locationid", item => item.LocationId },
-            { "expiration-date", item => item.ExpirationDate }
+            { "expirationDate", item => item.ExpirationDate }
         };
 
         public async Task<InventoryItem> AddAsync(InventoryItem item)

@@ -31,7 +31,6 @@ namespace PrepperApi.Controllers
                     UserId = item.UserId
                 }).ToList();
 
-
                 return Ok(resultList);
             }
             catch (ArgumentException ex)
