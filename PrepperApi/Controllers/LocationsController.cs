@@ -5,7 +5,9 @@ using Prepper.Models;
 
 namespace PrepperApi.Controllers
 {
-    public class LocationController(IRepositoryDB<Location> repository) : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LocationsController(IRepositoryDB<Location> repository) : Controller
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -15,7 +17,15 @@ namespace PrepperApi.Controllers
             try
             {
                 var result = await repository.GetAllAsync(sortBy, ascending);
-                return Ok(result);
+
+                var locationDtos = result.Select(location => new LocationDTO
+                {
+                    Id = location.Id,
+                    Name = location.Name,
+                    CreatedAt = location.CreatedAt
+                    }).ToList();
+
+                return Ok(locationDtos);
             }
             catch (ArgumentException ex)
             {
@@ -34,7 +44,7 @@ namespace PrepperApi.Controllers
                 return NotFound($"Location with ID: {id} not found");
             }
 
-            var locationDto = new Location
+            var locationDto = new LocationDTO
             {
                 Id = result.Id,
                 Name = result.Name,
@@ -65,7 +75,7 @@ namespace PrepperApi.Controllers
 
             var createdLocation = await repository.AddAsync(location);
 
-            var locationDto = new Location
+            var locationDto = new LocationDTO
             {
                 Id = createdLocation.Id,
                 Name = createdLocation.Name,
@@ -96,6 +106,25 @@ namespace PrepperApi.Controllers
             };
 
             var result = await repository.UpdateAsync(id, updatedLocation);
+            if (result == null)
+            {
+                return NotFound($"Location with ID: {id} not found");
+            }
+
+            return Ok(new LocationDTO
+            {
+                Id = result.Id,
+                Name = result.Name,
+                CreatedAt = result.CreatedAt
+            });
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await repository.DeleteAsync(id);
             if (result == null)
             {
                 return NotFound($"Location with ID: {id} not found");

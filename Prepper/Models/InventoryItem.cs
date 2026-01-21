@@ -11,9 +11,9 @@ namespace Prepper.Models
         [Column("created_at", ignoreOnInsert: true)]
         public DateTimeOffset CreatedAt { get; set; }
         [Column("ingredient_id")]
-        public int IngredientId { get; set; }
+        public int? IngredientId { get; set; }
         [Column("recipe_id")]
-        public int RecipeId { get; set; }
+        public int? RecipeId { get; set; }
         [Column("quantity")]
         public float Quantity { get; set; }
         [Column("unit")]
@@ -25,7 +25,7 @@ namespace Prepper.Models
         [Column("user_id")]
         public int UserId { get; set; }
 
-        public InventoryItem(int id, DateTimeOffset createdAt, int ingredientId, int recipeId, float quantity, string unit, DateTimeOffset? expirationDate, int locationId, int userId)
+        public InventoryItem(int id, DateTimeOffset createdAt, int? ingredientId, int? recipeId, float quantity, string unit, DateTimeOffset? expirationDate, int locationId, int userId)
         {
             Id = id;
             CreatedAt = createdAt;

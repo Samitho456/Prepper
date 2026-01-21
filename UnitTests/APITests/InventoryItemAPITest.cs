@@ -11,7 +11,7 @@ namespace UnitTests;
 public class InventoryItemAPITest
 {
     private Mock<IRepositoryDB<InventoryItemDTO>> _mockRepo;
-    private InventoryItemController _controller;
+    private InventoryItemsController _controller;
 
     [TestInitialize]
     public void Setup()

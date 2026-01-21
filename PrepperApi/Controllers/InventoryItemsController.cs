@@ -7,7 +7,7 @@ namespace PrepperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InventoryItemController(IRepositoryDB<InventoryItem> repository) : Controller
+    public class InventoryItemsController(IRepositoryDB<InventoryItem> repository) : Controller
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
