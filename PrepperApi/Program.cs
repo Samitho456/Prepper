@@ -28,6 +28,7 @@ builder.Services.AddScoped<IRepositoryDB<Recipe>, RecipeDBRepo>();
 builder.Services.AddScoped<IRepositoryDB<RecipeIngredient>, RecipeIngredientDBRepo>();
 builder.Services.AddScoped<IRepositoryDB<RecipeInstruction>, RecipeInstructionDBRepo>();
 builder.Services.AddScoped<IRepositoryDB<MealPlan>, MealPlanDBRepo>();
+builder.Services.AddScoped<IRepositoryDB<InventoryItem>, InventoryItemDBRepo>();
 
 // Add services to the container.
 builder.Services.AddControllers();
