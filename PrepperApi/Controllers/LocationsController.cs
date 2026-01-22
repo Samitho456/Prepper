@@ -2,6 +2,7 @@
 using Prepper;
 using Prepper.DTOs;
 using Prepper.Models;
+using Sprache;
 
 namespace PrepperApi.Controllers
 {
@@ -22,7 +23,7 @@ namespace PrepperApi.Controllers
                 {
                     Id = location.Id,
                     Name = location.Name,
-                    CreatedAt = location.CreatedAt
+                    CreatedAt = location.CreatedAt ?? DateTimeOffset.MinValue
                     }).ToList();
 
                 return Ok(locationDtos);
@@ -48,7 +49,7 @@ namespace PrepperApi.Controllers
             {
                 Id = result.Id,
                 Name = result.Name,
-                CreatedAt = result.CreatedAt
+                CreatedAt = result.CreatedAt ?? DateTimeOffset.MinValue
             };
 
             return Ok(locationDto);
@@ -57,7 +58,7 @@ namespace PrepperApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] Location location)
+        public async Task<IActionResult> Create([FromBody] LocationDTO location)
         {
             if (location == null)
             {
@@ -73,23 +74,21 @@ namespace PrepperApi.Controllers
                 Name = location.Name
             };
 
-            var createdLocation = await repository.AddAsync(location);
+            var createdLocation = await repository.AddAsync(newLocation);
 
-            var locationDto = new LocationDTO
+            return CreatedAtAction(nameof(Get), new { id = createdLocation.Id }, new LocationDTO
             {
                 Id = createdLocation.Id,
                 Name = createdLocation.Name,
-                CreatedAt = createdLocation.CreatedAt
-            };
-
-            return CreatedAtAction(nameof(Get), new { id = createdLocation.Id }, createdLocation);
+                CreatedAt = createdLocation.CreatedAt ?? DateTimeOffset.MinValue
+            });
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] Location location)
+        public async Task<IActionResult> Update(int id, [FromBody] LocationDTO location)
         {
             if (location == null)
             {
@@ -115,7 +114,7 @@ namespace PrepperApi.Controllers
             {
                 Id = result.Id,
                 Name = result.Name,
-                CreatedAt = result.CreatedAt
+                CreatedAt = result.CreatedAt ?? DateTimeOffset.MinValue
             });
         }
 
@@ -134,7 +133,7 @@ namespace PrepperApi.Controllers
             {
                 Id = result.Id,
                 Name = result.Name,
-                CreatedAt = result.CreatedAt
+                CreatedAt = result.CreatedAt ?? DateTimeOffset.MinValue
             });
         }
     }

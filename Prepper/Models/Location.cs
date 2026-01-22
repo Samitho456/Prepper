@@ -1,5 +1,6 @@
 ﻿using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
+using System.Text.Json.Serialization;
 
 namespace Prepper.Models
 {
@@ -10,10 +11,10 @@ namespace Prepper.Models
         public int Id { get; set; }
         [Column("name")]
         public string Name { get; set; }
-        [Column("created_at")]
-        public DateTimeOffset CreatedAt { get; set; }
+        [Column("created_at", ignoreOnInsert: true)]
+        public DateTimeOffset? CreatedAt { get; set; }
 
-        public Location(int id, string name, DateTimeOffset createdAt)
+        public Location(int id, string name, DateTimeOffset? createdAt)
         {
             Id = id;
             Name = name;
