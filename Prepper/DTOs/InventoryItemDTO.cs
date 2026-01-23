@@ -12,7 +12,7 @@ namespace Prepper.DTOs
         public int? RecipeId { get; set; }
         public float Quantity { get; set; }
         public string Unit { get; set; }
-        public DateTimeOffset? ExpirationDate { get; set; }
+        public DateOnly? ExpirationDate { get; set; }
         public int LocationId { get; set; }
         public int UserId { get; set; }
     }

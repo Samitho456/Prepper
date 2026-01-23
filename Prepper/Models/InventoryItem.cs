@@ -19,13 +19,13 @@ namespace Prepper.Models
         [Column("unit")]
         public string Unit { get; set; }
         [Column("expiration_date")]
-        public DateTimeOffset? ExpirationDate { get; set; }
+        public DateOnly? ExpirationDate { get; set; }
         [Column("location_id")]
         public int LocationId { get; set; }
         [Column("user_id")]
         public int UserId { get; set; }
 
-        public InventoryItem(int id, DateTimeOffset createdAt, int? ingredientId, int? recipeId, float quantity, string unit, DateTimeOffset? expirationDate, int locationId, int userId)
+        public InventoryItem(int id, DateTimeOffset createdAt, int? ingredientId, int? recipeId, float quantity, string unit, DateOnly? expirationDate, int locationId, int userId)
         {
             Id = id;
             CreatedAt = createdAt;

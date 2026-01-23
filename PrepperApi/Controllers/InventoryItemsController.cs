@@ -187,7 +187,7 @@ namespace PrepperApi.Controllers
             {
                 return NotFound($"Inventory Item with ID: {id} not found");
             }
-            return Ok(new InventoryItem
+            return Ok(new InventoryItemDTO
             {
                 Id = result.Id,
                 CreatedAt = result.CreatedAt,
